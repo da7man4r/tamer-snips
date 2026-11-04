@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="images/logo.png">
+  <title>Admin Panel | Tamer Hairstylist</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+:root {
+  --bg: #161616;
+  --side: #1b1b1b;
+  --card: #232323;
+  --card-2: #1d1d1d;
+  --line: #333;
+  --gold: #c8a951;
+  --gold-soft: rgba(200, 169, 81, 0.14);
+  --text: #f5f0e6;
+  --muted: #8f8a80;
+  --green: #4fbf7f;
+  --green-bg: rgba(79, 191, 127, 0.16);
+  --red: #c0392b;
+  --red-bg: rgba(192, 57, 43, 0.2);
+  --amber-bg: rgba(200, 169, 81, 0.18);
+  --serif: "Playfair Display", Georgia, serif;
+  --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 var(--sans); }
+h1, h2, h3, h4 { font-family: var(--serif); margin: 0; }
+p { margin: 0; }
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+a { color: inherit; text-decoration: none; }
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+svg.i { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+/* ---------- Layout ---------- */
+.app { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+.view-radio { position: absolute; opacity: 0; pointer-events: none; }
+
+.sidebar {
+  position: sticky; top: 0; height: 100vh;
+  display: flex; flex-direction: column;
+  background: var(--side); border-right: 1px solid #262626; padding: 16px;
+}
+.brand { display: flex; align-items: center; gap: 10px; padding: 4px 4px 18px; border-bottom: 1px solid #2a2a2a; margin-bottom: 18px; }
+.brand .logo { width: 40px; height: 40px; border-radius: 50%; background: #fff; color: #111; display: grid; place-items: center; font: 700 .5rem var(--serif); }
+.brand strong { display: block; font: 700 .95rem var(--serif); color: var(--gold); line-height: 1.1; }
+.brand span { font-size: .72rem; color: var(--muted); }
+
+.side-nav { display: grid; gap: 4px; }
+.side-nav label {
+  display: flex; align-items: center; gap: 12px;
+  padding: 11px 14px; border-radius: 8px; border: 1px solid transparent;
+  color: #cfc9bd; font-size: .9rem; cursor: pointer;
+}
+.side-nav label:hover { background: #242424; }
+
+.user { margin-top: auto; display: flex; align-items: center; gap: 10px; padding: 12px; background: #242424; border-radius: 10px; }
+.avatar { width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center; background: #3a321c; color: var(--gold); font-weight: 700; font-size: .8rem; flex: none; }
+.user small { display: block; color: var(--muted); font-size: .72rem; }
+.user .i { margin-left: auto; color: var(--muted); }
+
+.main { padding: 32px 36px 60px; min-width: 0; }
+.head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+.head h1 { font-size: 2.6rem; line-height: 1.1; }
+.head p { color: var(--muted); font-size: .9rem; margin-top: 4px; }
+.date { padding: 8px 18px; border-radius: 8px; background: var(--card); border: 1px solid var(--line); color: var(--muted); font-size: .8rem; white-space: nowrap; }
+
+/* ---------- Tabs ---------- */
+.tabs { display: flex; gap: 28px; flex-wrap: wrap; border-bottom: 1px solid var(--line); margin: 24px 0 24px; }
+.tabs label { display: flex; align-items: center; gap: 8px; padding: 10px 2px; margin-bottom: -1px; border-bottom: 2px solid transparent; color: var(--muted); font-size: .9rem; cursor: pointer; }
+.tabs label:hover { color: var(--text); }
+
+/* ---------- View switching (CSS only) ---------- */
+.view { display: none; }
+.app:has(#v-overview:checked) .view-overview,
+.app:has(#v-services:checked) .view-services,
+.app:has(#v-appointments:checked) .view-appointments,
+.app:has(#v-products:checked) .view-products,
+.app:has(#v-team:checked) .view-team,
+.app:has(#v-discounts:checked) .view-discounts,
+.app:has(#v-settings:checked) .view-settings { display: block; }
+
+.app:has(#v-settings:checked) .tabs { display: none; }
+.app:has(#v-settings:checked) .head { display: none; }
+.app:not(:has(#v-settings:checked)) .settings-head { display: none; }
+
+/* sidebar + tab highlights */
+.app:has(#v-overview:checked) .nav-overview,
+.app:has(#v-appointments:checked) .nav-appointments,
+.app:has(#v-team:checked) .nav-team,
+.app:has(#v-products:checked) .nav-products,
+.app:has(#v-discounts:checked) .nav-discounts,
+.app:has(#v-settings:checked) .nav-settings { background: #2a271d; border-color: #3b3524; color: var(--text); }
+.app:has(#v-overview:checked) .tab-overview,
+.app:has(#v-services:checked) .tab-services,
+.app:has(#v-appointments:checked) .tab-appointments,
+.app:has(#v-products:checked) .tab-products,
+.app:has(#v-team:checked) .tab-team,
+.app:has(#v-discounts:checked) .tab-discounts { color: var(--text); border-bottom-color: var(--gold); }
+.app:has(#v-overview:checked) .tab-overview .i,
+.app:has(#v-services:checked) .tab-services .i,
+.app:has(#v-appointments:checked) .tab-appointments .i,
+.app:has(#v-products:checked) .tab-products .i,
+.app:has(#v-team:checked) .tab-team .i,
+.app:has(#v-discounts:checked) .tab-discounts .i { color: var(--gold); }
+.app:has(.view-radio:focus-visible) .sidebar { outline: none; }
+
+/* ---------- Shared components ---------- */
+.card { background: var(--card); border: 1px solid #2c2c2c; border-radius: 12px; padding: 20px; }
+.btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: 8px; border: 1px solid var(--gold); background: var(--gold); color: #1a1a1a; font-weight: 500; white-space: nowrap; }
+.btn:hover { background: #d9bb64; }
+.btn-ghost { background: transparent; color: var(--gold); }
+.btn-danger { background: #a8312a; border-color: #a8312a; color: #fff; }
+.btn-block { width: 100%; justify-content: center; }
+.toolbar { display: flex; gap: 14px; margin-bottom: 20px; flex-wrap: wrap; }
+.search { flex: 1; min-width: 220px; display: flex; align-items: center; gap: 10px; padding: 0 14px; background: var(--card); border: 1px solid var(--line); border-radius: 8px; color: var(--muted); }
+.search input { flex: 1; background: none; border: 0; padding: 11px 0; outline: none; color: var(--text); }
+.pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: .72rem; }
+.pill-green { background: var(--green-bg); color: var(--green); }
+.pill-amber { background: var(--amber-bg); color: var(--gold); }
+.pill-red { background: var(--red-bg); color: #ef6a5b; }
+.pill-grey { background: #333; color: #aaa; }
+.grid { display: grid; gap: 16px; }
+.g2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.g3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.g4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+/* ---------- Overview ---------- */
+.stat .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.stat .ico { width: 38px; height: 38px; border-radius: 8px; background: #302c20; color: var(--gold); display: grid; place-items: center; }
+.stat .trend { color: var(--green); font-size: .78rem; }
+.stat strong { display: block; font: 700 1.9rem var(--sans); }
+.stat span { color: var(--muted); font-size: .8rem; }
+.charts { grid-template-columns: 1.7fr 1fr; margin-top: 16px; }
+.card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.card-head h3 { font-size: 1.15rem; }
+.chip { padding: 3px 10px; background: #2d2d2d; border-radius: 6px; font-size: .72rem; color: var(--muted); }
+.chart-svg { width: 100%; height: auto; display: block; }
+.donut-wrap { display: grid; justify-items: center; gap: 14px; }
+.donut {
+  width: 150px; aspect-ratio: 1; border-radius: 50%;
+  background: conic-gradient(var(--gold) 0 42%, #b5222b 42% 65%, #4fbf7f 65% 80%, #4a7bd0 80% 92%, #888 92% 100%);
+  -webkit-mask: radial-gradient(circle, transparent 56%, #000 57%); mask: radial-gradient(circle, transparent 56%, #000 57%);
+}
+.legend { list-style: none; margin: 0; padding: 0; width: 100%; display: grid; gap: 6px; font-size: .78rem; color: #cfc9bd; }
+.legend li { display: flex; align-items: center; gap: 8px; }
+.legend li i { width: 9px; height: 9px; border-radius: 50%; }
+.legend li b { margin-left: auto; font-weight: 500; }
+
+/* ---------- Services ---------- */
+.svc { display: grid; gap: 4px; }
+.svc .row { display: flex; justify-content: space-between; align-items: flex-start; }
+.tag { align-self: flex-start; padding: 1px 9px; border-radius: 5px; background: #333; color: #aaa; font-size: .7rem; width: fit-content; }
+.svc h3 { font-size: 1.5rem; margin-top: 6px; }
+.svc .price { font: 700 1.35rem var(--serif); color: var(--gold); text-align: right; }
+.svc .dur { color: var(--muted); font-size: .75rem; text-align: right; }
+.svc .desc { color: var(--muted); font-size: .8rem; margin: 2px 0 10px; }
+.svc .foot { display: flex; gap: 10px; align-items: center; }
+.svc .status { flex: 1; text-align: center; padding: 6px; border-radius: 6px; background: #1f4a37; color: var(--green); font-size: .8rem; }
+.icon-btn { width: 32px; height: 32px; display: grid; place-items: center; background: none; border: 0; color: var(--muted); border-radius: 6px; }
+.icon-btn:hover { background: #333; color: var(--text); }
+
+/* ---------- Tables ---------- */
+.table-wrap { overflow-x: auto; background: var(--card); border: 1px solid #2c2c2c; border-radius: 12px; }
+table { width: 100%; border-collapse: collapse; min-width: 640px; }
+th { text-align: left; color: var(--muted); font-weight: 500; font-size: .76rem; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+td { padding: 14px 16px; border-bottom: 1px solid #2c2c2c; font-size: .85rem; vertical-align: middle; }
+tr:last-child td { border-bottom: 0; }
+td small { display: block; color: var(--muted); font-size: .74rem; }
+td.time { color: var(--gold); font-weight: 500; }
+.table-foot { padding: 14px 16px; color: var(--muted); font-size: .8rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #2c2c2c; }
+.mini { padding: 3px 9px; border-radius: 5px; border: 0; font-size: .74rem; }
+.mini.cancel { background: var(--red-bg); color: #ef6a5b; }
+.mini.done { background: var(--green-bg); color: var(--green); }
+.barber-filter { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+.barber-filter span { padding: 5px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); font-size: .8rem; color: #cfc9bd; }
+.barber-filter span.on { background: var(--gold); border-color: var(--gold); color: #1a1a1a; }
+.page-btns { display: flex; gap: 8px; }
+.page-btns span { padding: 6px 14px; border-radius: 6px; background: #2c2c2c; font-size: .8rem; }
+.page-btns span.on { background: var(--gold); color: #1a1a1a; }
+
+/* ---------- Products ---------- */
+.product { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+.product .img { position: relative; aspect-ratio: 1 / 0.95; background: #3a3a3a center / cover; }
+.product .badge-off { position: absolute; top: 10px; left: 10px; background: #8d1f2a; font-size: .7rem; padding: 2px 8px; border-radius: 4px; }
+.product .badge-pub { position: absolute; top: 10px; right: 10px; }
+.product .body { padding: 14px; display: grid; gap: 4px; flex: 1; }
+.product .brand-name { color: var(--muted); font-size: .72rem; }
+.product h3 { font-size: 1.35rem; }
+.product .cat { color: var(--muted); font-size: .75rem; }
+.product .price { font-weight: 700; }
+.product .price s { color: var(--muted); font-weight: 400; margin-right: 6px; }
+.product .price b { color: var(--gold); }
+.product .stock { color: var(--muted); font-size: .78rem; }
+.product .actions { display: flex; gap: 8px; padding: 0 14px 14px; }
+.view-toggle { display: flex; gap: 6px; }
+.view-toggle span { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 8px; background: var(--card); border: 1px solid var(--line); color: var(--muted); }
+.view-toggle span.on { background: var(--gold); border-color: var(--gold); color: #1a1a1a; }
+
+/* ---------- Team ---------- */
+.member .top { display: flex; gap: 12px; align-items: flex-start; }
+.member .avatar { width: 48px; height: 48px; font-size: 1rem; }
+.member h3 { font-size: 1.15rem; }
+.member .role { color: var(--muted); font-size: .8rem; }
+.member .meta { display: flex; gap: 14px; flex-wrap: wrap; color: var(--muted); font-size: .78rem; margin-top: 4px; }
+.member .top .pill { margin-left: auto; }
+.sched-head { display: flex; justify-content: space-between; margin: 16px 0 8px; font-size: .75rem; color: var(--muted); }
+.sched-head a { color: var(--gold); }
+.week { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; text-align: center; font-size: .68rem; color: var(--muted); }
+.week .on { color: var(--text); }
+.week .on::after, .week .off::after { content: ""; display: block; height: 4px; border-radius: 2px; margin: 4px 0 4px; background: var(--gold); }
+.week .off { opacity: .45; }
+.week .off::after { background: #444; }
+.week small { display: block; font-size: .62rem; line-height: 1.2; color: var(--muted); }
+.works { color: var(--muted); font-size: .75rem; margin-top: 10px; }
+
+/* ---------- Discounts ---------- */
+.coupon { display: grid; gap: 4px; }
+.coupon .row { display: flex; justify-content: space-between; align-items: center; }
+.coupon code { font: 700 1.05rem ui-monospace, "SFMono-Regular", Menlo, monospace; color: var(--gold); letter-spacing: .04em; }
+.coupon small { color: var(--muted); font-size: .72rem; }
+.meter { height: 5px; border-radius: 3px; background: #3a3a3a; margin: 12px 0 8px; overflow: hidden; }
+.meter i { display: block; height: 100%; background: var(--gold); }
+.meter.full i { background: #b3261e; }
+.coupon.paused { opacity: .55; }
+.coupon .foot { display: flex; justify-content: flex-end; color: var(--muted); }
+
+/* ---------- Settings ---------- */
+.settings-head h1 { font-size: 2.4rem; }
+.settings-head p { color: var(--muted); }
+.settings-head { margin-bottom: 24px; }
+.stack { display: grid; gap: 18px; max-width: 900px; }
+.stack h3 { font-size: 1.35rem; margin-bottom: 16px; }
+.fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.field { display: grid; gap: 6px; }
+.field.full { grid-column: 1 / -1; }
+.field label { font-size: .75rem; color: var(--muted); }
+.field input, .field select, .field textarea { width: 100%; padding: 11px 14px; background: #181818; border: 1px solid var(--line); border-radius: 8px; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--gold); outline: none; }
+.field textarea { min-height: 90px; resize: vertical; }
+.switch-row { display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 12px 14px; background: #1c1c1c; border-radius: 8px; margin-bottom: 8px; }
+.switch-row small { display: block; color: var(--muted); font-size: .72rem; }
+.switch { position: relative; width: 44px; height: 24px; flex: none; }
+.switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; z-index: 1; }
+.switch span { position: absolute; inset: 0; border-radius: 12px; background: #444; transition: background .2s; }
+.switch span::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: transform .2s; }
+.switch input:checked + span { background: var(--gold); }
+.switch input:checked + span::after { transform: translateX(20px); }
+.switch input:focus-visible + span { outline: 2px solid var(--gold); outline-offset: 2px; }
+.days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+.days label { aspect-ratio: 1; display: grid; place-items: center; background: #1c1c1c; border: 1px solid var(--line); border-radius: 8px; font-weight: 500; cursor: pointer; }
+.days label:has(input:checked) { border-color: var(--gold); background: var(--gold-soft); }
+.days input { position: absolute; opacity: 0; pointer-events: none; }
+.save-row { display: flex; justify-content: flex-end; }
+
+/* ---------- Modal (CSS only via :target) ---------- */
+.modal { display: none; position: fixed; inset: 0; z-index: 100; background: rgba(0,0,0,.7); place-items: center; padding: 16px; }
+.modal:target { display: grid; }
+.modal-box { width: min(560px, 100%); background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 0 0 22px; }
+.modal-box header { display: flex; justify-content: space-between; align-items: center; padding: 20px 22px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+.modal-box h2 { font-size: 1.5rem; }
+.modal-box .fields { padding: 0 22px; }
+.modal-actions { display: grid; grid-template-columns: 1fr auto; gap: 12px; padding: 18px 22px 0; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 1100px) {
+  .g4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .g3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .charts { grid-template-columns: 1fr; }
+}
+@media (max-width: 800px) {
+  .app { grid-template-columns: 1fr; }
+  .sidebar { position: static; height: auto; flex-direction: column; }
+  .side-nav { grid-template-columns: repeat(3, 1fr); }
+  .side-nav label { justify-content: center; padding: 10px 6px; font-size: .78rem; }
+  .side-nav label span { display: none; }
+  .user { display: none; }
+  .main { padding: 24px 16px 48px; }
+  .g2, .g3, .g4, .fields { grid-template-columns: 1fr; }
+  .head h1 { font-size: 2rem; }
+  .date { display: none; }
+  .tabs { gap: 16px; overflow-x: auto; flex-wrap: nowrap; }
+  .tabs label { white-space: nowrap; }
+}
+
+/* ---------- Added for the live (database) version ---------- */
+[hidden] { display: none !important; }
+.muted { color: var(--muted); }
+.btn:disabled, .icon-btn:disabled, .page-btns button:disabled { opacity: .4; cursor: not-allowed; }
+.modal.open { display: grid; }
+.modal-box { max-height: 92vh; overflow: auto; }
+.field.full { grid-column: 1 / -1; }
+.sub-h { font-size: 1.6rem; margin: 40px 0 16px; }
+.note { margin-top: 18px; font-size: .85rem; }
+
+.login { min-height: 100vh; display: grid; place-items: center; padding: 20px; }
+.login-box { width: min(400px, 100%); background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 32px; display: grid; gap: 14px; }
+.login-box h1 { font-size: 2rem; text-align: center; }
+.login-box .muted { text-align: center; font-size: .9rem; }
+.login .logo, .brand .logo { border: 2px solid #ddd; }
+
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; z-index: 300;
+  background: #2b2b2b; border: 1px solid var(--gold); padding: 12px 20px; border-radius: 8px; max-width: min(92vw, 460px); transition: opacity .2s, transform .2s; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast.error { border-color: #c0392b; }
+.setup-banner { background: #3a2a12; color: #f3d9a4; text-align: center; padding: 10px 16px; font-size: .9rem; }
+.setup-banner code { background: rgba(0,0,0,.35); padding: 1px 6px; border-radius: 4px; }
+
+button.status { border: 0; cursor: pointer; }
+.svc .status.off { background: #3a3a3a; color: #aaa; }
+.pill-btn { border: 0; cursor: pointer; }
+.link-btn { background: none; border: 0; color: var(--gold); cursor: pointer; padding: 0; }
+.barber-filter button, .page-btns button, .view-toggle button { padding: 5px 14px; border-radius: 8px; border: 1px solid var(--line); background: var(--card); color: #cfc9bd; font-size: .8rem; cursor: pointer; }
+.barber-filter button.on { background: var(--gold); border-color: var(--gold); color: #1a1a1a; }
+.page-btns button { background: #2c2c2c; border: 0; }
+.view-toggle button { width: 38px; height: 38px; padding: 0; display: grid; place-items: center; color: var(--muted); }
+.view-toggle button.on { background: var(--gold); border-color: var(--gold); color: #1a1a1a; }
+.mini { cursor: pointer; }
+td .icon-btn { display: inline-grid; vertical-align: middle; }
+.mini-select { background: #1a1a1a; border: 1px solid var(--line); border-radius: 6px; padding: 5px 8px; }
+.list-mode { grid-template-columns: 1fr !important; }
+.list-mode .product { flex-direction: row; align-items: center; }
+.list-mode .product .img { width: 150px; aspect-ratio: 1; flex: none; }
+.list-mode .product .actions { padding: 14px; }
+
+.skills { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.skills span { padding: 2px 9px; border-radius: 5px; background: var(--gold-soft); color: var(--gold); font-size: .72rem; }
+.member-actions { display: flex; gap: 10px; margin-top: 14px; }
+.member-actions .btn { padding: 8px 14px; font-size: .85rem; }
+.pill-btn.pill-green, .pill-btn.pill-grey { margin-left: auto; align-self: flex-start; }
+
+.sched-row { display: grid; grid-template-columns: 90px 1fr auto 1fr; gap: 10px; align-items: center; }
+.sched-row input[type="time"] { padding: 8px 10px; background: #181818; border: 1px solid var(--line); border-radius: 8px; }
+.check { display: flex; align-items: center; gap: 8px; }
+
+.month-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+.month-nav .btn { padding: 6px 14px; }
+.dow, .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; }
+.dow { text-align: center; color: var(--muted); font-size: .72rem; margin-bottom: 6px; }
+.days label { position: relative; aspect-ratio: 1; min-height: 38px; }
+.days label:has(input:checked) { background: var(--red-bg); border-color: #a8312a; }
+.modal-box .fields { padding: 0 22px; }
+@media (max-width: 520px) { .sched-row { grid-template-columns: 70px 1fr auto 1fr; } .list-mode .product { flex-direction: column; } .list-mode .product .img { width: 100%; } }
+
+.field .hint { color: var(--muted); font-size: .78rem; }
+
+/* service photos + upload */
+.svc-img { height: 130px; margin: -20px -20px 12px; border-radius: 12px 12px 0 0; background: #333 center / cover no-repeat; }
+.img-row { display: flex; gap: 14px; align-items: center; }
+.img-preview { width: 110px; height: 80px; flex: none; border-radius: 8px; border: 1px dashed var(--line); background: #1c1c1c center / cover no-repeat; }
+.img-ctl { display: grid; gap: 6px; justify-items: start; }
+.btn-file { position: relative; padding: 8px 14px; font-size: .85rem; cursor: pointer; }
+.btn-file input { position: absolute; inset: 0; opacity: 0; cursor: pointer; font-size: 0; }
+.btn-file:has(input:focus-visible) { outline: 2px solid var(--gold); outline-offset: 2px; }
+/* big revenue numbers must fit the stat cards */
+.stat strong { font-size: clamp(1.25rem, 2.1vw, 1.9rem); line-height: 1.2; overflow-wrap: anywhere; }
+
+/* your own logo (images/logo.png) */
+.logo.has-logo { color: transparent; font-size: 0; border: 0; border-radius: 0; background-color: transparent; background-size: contain; background-repeat: no-repeat; background-position: center; }
+.brand .logo.has-logo { width: 54px; height: 54px; }
+.login .brand .logo.has-logo { width: 96px; height: 96px; }
+
+  </style>
+</head>
+<body>
+
+<!-- Icon sprite -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6M16 4.8a3.5 3.5 0 0 1 0 6.4M18 14.3c2.2.7 3.5 2.6 3.5 5.7"/></symbol>
+  <symbol id="i-box" viewBox="0 0 24 24"><path d="M21 8 12 3 3 8v8l9 5 9-5V8zM3 8l9 5 9-5M12 13v8"/></symbol>
+  <symbol id="i-tag" viewBox="0 0 24 24"><path d="M3 12V4h8l10 10-8 8L3 12z"/><circle cx="7.5" cy="8.5" r="1.2"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+  <symbol id="i-scissors" viewBox="0 0 24 24"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/></symbol>
+  <symbol id="i-dollar" viewBox="0 0 24 24"><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="2.6"/><path d="M6 12h.01M18 12h.01"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13M10 11v6M14 11v6"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-out" viewBox="0 0 24 24"><path d="M9 4H5v16h4M16 8l4 4-4 4M20 12H9"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 5 5 9-10"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="M12 3l2.7 6 6.3.6-4.8 4.2 1.4 6.2L12 16.8 6.4 20l1.4-6.2L3 9.6 9.3 9 12 3z"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M5 3h12l4 4v14H5V3zM8 3v6h8V3M8 21v-7h8v7"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+</svg>
+
+<!-- Login -->
+<div class="login" id="login" hidden>
+  <form class="login-box" id="login-form">
+    <div class="brand" style="justify-content:center;border:0"><div class="logo">TAMER</div></div>
+    <h1>Admin login</h1>
+    <p class="muted" id="login-msg">Sign in to manage Tamer Hairstylist.</p>
+    <div class="field"><label for="l-email">Email</label><input id="l-email" type="email" autocomplete="username" required></div>
+    <div class="field"><label for="l-pass">Password</label><input id="l-pass" type="password" autocomplete="current-password" required></div>
+    <button class="btn btn-block" type="submit">Sign in</button>
+  </form>
+</div>
+
+<div class="app" id="app" hidden>
+
+  <input class="view-radio" type="radio" name="view" id="v-overview" checked aria-label="Overview">
+  <input class="view-radio" type="radio" name="view" id="v-services" aria-label="Services and haircuts">
+  <input class="view-radio" type="radio" name="view" id="v-appointments" aria-label="Appointments">
+  <input class="view-radio" type="radio" name="view" id="v-products" aria-label="Products">
+  <input class="view-radio" type="radio" name="view" id="v-team" aria-label="Team">
+  <input class="view-radio" type="radio" name="view" id="v-discounts" aria-label="Discounts">
+  <input class="view-radio" type="radio" name="view" id="v-settings" aria-label="Settings">
+
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">TAMER</div>
+      <div><strong>Tamer Hairstylist</strong><span>Manager Portal</span></div>
+    </div>
+    <nav class="side-nav" aria-label="Admin">
+      <label class="nav-overview" for="v-overview"><svg class="i"><use href="#i-grid"/></svg><span>Dashboard</span></label>
+      <label class="nav-appointments" for="v-appointments"><svg class="i"><use href="#i-cal"/></svg><span>Appointments</span></label>
+      <label class="nav-team" for="v-team"><svg class="i"><use href="#i-users"/></svg><span>Barbers</span></label>
+      <label class="nav-products" for="v-products"><svg class="i"><use href="#i-box"/></svg><span>Products</span></label>
+      <label class="nav-discounts" for="v-discounts"><svg class="i"><use href="#i-tag"/></svg><span>Discounts</span></label>
+      <label class="nav-settings" for="v-settings"><svg class="i"><use href="#i-gear"/></svg><span>Settings</span></label>
+    </nav>
+    <div class="user">
+      <div class="avatar" id="user-initials">AD</div>
+      <div><span id="user-name">Admin</span><small>Admin</small></div>
+      <button class="icon-btn" id="logout" type="button" aria-label="Sign out" style="margin-left:auto"><svg class="i"><use href="#i-out"/></svg></button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="head">
+      <div><h1>Admin Panel</h1><p>Manage every aspect of Tamer Hairstylist</p></div>
+      <div class="date" id="today-label"></div>
+    </div>
+
+    <div class="tabs" role="tablist" aria-label="Sections">
+      <label class="tab-overview" for="v-overview"><svg class="i"><use href="#i-chart"/></svg>Overview</label>
+      <label class="tab-services" for="v-services"><svg class="i"><use href="#i-scissors"/></svg>Services &amp; Haircuts</label>
+      <label class="tab-appointments" for="v-appointments"><svg class="i"><use href="#i-cal"/></svg>Appointments</label>
+      <label class="tab-products" for="v-products"><svg class="i"><use href="#i-box"/></svg>Products</label>
+      <label class="tab-team" for="v-team"><svg class="i"><use href="#i-users"/></svg>Team</label>
+      <label class="tab-discounts" for="v-discounts"><svg class="i"><use href="#i-tag"/></svg>Discounts</label>
+    </div>
+
+    <section class="view view-overview" id="ov"></section>
+
+    <section class="view view-services">
+      <div class="toolbar">
+        <div class="search"><svg class="i"><use href="#i-search"/></svg><input type="search" data-search="svc" placeholder="Search services..." aria-label="Search services"></div>
+        <button class="btn" type="button" data-act="svc-add"><svg class="i"><use href="#i-plus"/></svg>Add Service</button>
+      </div>
+      <div class="grid g2" id="svc-list"></div>
+    </section>
+
+    <section class="view view-appointments">
+      <div class="toolbar">
+        <div class="search"><svg class="i"><use href="#i-search"/></svg><input type="search" data-search="appt" placeholder="Search customer or phone..." aria-label="Search appointments"></div>
+        <button class="btn" type="button" data-act="appt-add"><svg class="i"><use href="#i-plus"/></svg>New Appointment</button>
+      </div>
+      <div class="barber-filter" id="appt-filter"></div>
+      <div id="appt-table"></div>
+    </section>
+
+    <section class="view view-products">
+      <div class="toolbar">
+        <div class="search"><svg class="i"><use href="#i-search"/></svg><input type="search" data-search="prod" placeholder="Search products..." aria-label="Search products"></div>
+        <div class="view-toggle">
+          <button type="button" class="on" data-act="prod-view" data-mode="grid" aria-label="Grid view"><svg class="i"><use href="#i-grid"/></svg></button>
+          <button type="button" data-act="prod-view" data-mode="list" aria-label="List view"><svg class="i"><use href="#i-list"/></svg></button>
+        </div>
+        <button class="btn" type="button" data-act="prod-add"><svg class="i"><use href="#i-plus"/></svg>Add Product</button>
+      </div>
+      <div class="grid g3" id="prod-list"></div>
+      <h2 class="sub-h">Pickup orders</h2>
+      <div id="order-table"></div>
+    </section>
+
+    <section class="view view-team">
+      <div class="toolbar" style="justify-content:flex-end">
+        <button class="btn" type="button" data-act="barber-add"><svg class="i"><use href="#i-plus"/></svg>Add Barber</button>
+      </div>
+      <div class="grid g2" id="team-list"></div>
+    </section>
+
+    <section class="view view-discounts">
+      <div class="toolbar" style="justify-content:flex-end">
+        <button class="btn" type="button" data-act="coupon-add"><svg class="i"><use href="#i-plus"/></svg>Create Coupon</button>
+      </div>
+      <div class="grid g2" id="coupon-list"></div>
+      <p class="muted note">Coupons are stored and tracked here. Applying them at checkout needs online payments, which this site does not have yet.</p>
+    </section>
+
+    <section class="view view-settings" id="settings"></section>
+  </main>
+</div>
+
+<!-- One reusable popup for every form -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <form class="modal-box" id="modal-form" novalidate>
+    <header><h2 id="modal-title"></h2><button class="icon-btn" type="button" data-modal="close" aria-label="Close"><svg class="i"><use href="#i-x"/></svg></button></header>
+    <div id="modal-body"></div>
+    <div class="modal-actions"><button class="btn btn-block" type="submit" id="modal-submit"></button><button class="btn btn-ghost" type="button" data-modal="close">Cancel</button></div>
+  </form>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+// Paste your two values from Supabase > Project Settings > API Keys
+// (or the "Connect" button at the top of your project).
+// The publishable key (starts with sb_publishable_) is SAFE to put here:
+// the database security rules decide what visitors can do.
+// NEVER paste a "secret" or "service_role" key into this file.
+window.SITE_CONFIG = {
+  SUPABASE_URL: "https://jwcelkmfmhhrqsbqtyru.supabase.co",
+  SUPABASE_KEY: "sb_publishable_wHgg4CTf8l6AeoKIBshlkw_C2E0RRwy"
+};
+
+/* Shared helpers used by the public site and the dashboard. */
+(function () {
+  const C = window.SITE_CONFIG || {};
+  const configured = /^https:\/\//.test(C.SUPABASE_URL || "") && !/PASTE/.test(C.SUPABASE_KEY || "PASTE");
+  const db = configured && window.supabase ? window.supabase.createClient(C.SUPABASE_URL, C.SUPABASE_KEY) : null;
+
+  const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const CURRENCY = "DZD";   // change this one word to use another currency label
+  const money = (n) => Number(n || 0).toLocaleString("en-US", { maximumFractionDigits: 2 }) + " " + CURRENCY;
+  const initials = (name) => String(name || "?").split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+  // Safe CSS for a background photo (the address is cleaned so it cannot break out of the style)
+  const cssImg = (u) => "background-image:url('" + String(u || "").replace(/[\s'"()<>\\]/g, (ch) => "%" + ch.charCodeAt(0).toString(16).toUpperCase().padStart(2, "0")) + "')";
+  const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+  const DAY_NAMES = { mon: "Mon", tue: "Tue", wed: "Wed", thu: "Thu", fri: "Fri", sat: "Sat", sun: "Sun" };
+
+  function fmtTime(t) {                       // "17:00" or "17:00:00" -> "5:00 PM"
+    const [h, m] = String(t).split(":").map(Number);
+    return ((h + 11) % 12 + 1) + ":" + String(m).padStart(2, "0") + " " + (h < 12 ? "AM" : "PM");
+  }
+  const toMin = (t) => { const [h, m] = String(t).split(":").map(Number); return h * 60 + m; };
+  const fromMin = (n) => String(Math.floor(n / 60)).padStart(2, "0") + ":" + String(n % 60).padStart(2, "0");
+  function fmtDate(iso, opts) {
+    const [y, m, d] = iso.split("-").map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString("en-US", opts || { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+  }
+  const isoOf = (dt) => dt.getFullYear() + "-" + String(dt.getMonth() + 1).padStart(2, "0") + "-" + String(dt.getDate()).padStart(2, "0");
+  function addDays(iso, n) { const [y, m, d] = iso.split("-").map(Number); return isoOf(new Date(y, m - 1, d + n)); }
+  function weekdayKey(iso) { const [y, m, d] = iso.split("-").map(Number); return DAYS[(new Date(y, m - 1, d).getDay() + 6) % 7]; }
+
+  // "Now" in the shop's own time zone, so bookings do not depend on the visitor's clock.
+  function shopNow(tz) {
+    const parts = new Intl.DateTimeFormat("en-CA", { timeZone: tz || "America/New_York", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(new Date());
+    const g = (t) => parts.find((p) => p.type === t).value;
+    return { date: g("year") + "-" + g("month") + "-" + g("day"), minutes: (Number(g("hour")) % 24) * 60 + Number(g("minute")) };
+  }
+  const absMinutes = (iso, mins) => { const [y, m, d] = iso.split("-").map(Number); return Date.UTC(y, m - 1, d) / 60000 + mins; };
+
+  const ERRORS = {
+    slot_taken: "Sorry, that time was just taken. Please pick another time.",
+    too_soon: "That time is too soon. Please choose a later slot.",
+    day_off: "The shop is closed on that day. Please choose another date.",
+    barber_off: "That barber does not work on that day.",
+    outside_hours: "That time is outside the barber's working hours.",
+    date_out_of_range: "That date cannot be booked yet. Please choose another.",
+    bad_phone: "Please enter a 10-digit phone number, like 0555123456.",
+    missing_details: "Please fill in your name and phone number.",
+    service_unavailable: "That service is no longer available.",
+    barber_unavailable: "That barber is no longer available.",
+    out_of_stock: "Sorry, one of the products is out of stock.",
+    product_unavailable: "One of the products is no longer available.",
+    empty_cart: "Your cart is empty.",
+    bad_quantity: "Please choose a quantity between 1 and 20."
+  };
+  function friendly(err) {
+    const msg = (err && (err.message || err.details)) || String(err || "");
+    for (const k in ERRORS) if (msg.includes(k)) return ERRORS[k];
+    if (/Bucket not found/i.test(msg)) return "Photo storage is not set up yet. Run the latest supabase-all-in-one.sql in Supabase.";
+    if (/row-level security|not authorized|Unauthorized/i.test(msg)) return "Not allowed. Make sure you are signed in as an admin and the latest SQL was run.";
+    if (/image_url.*(schema cache|does not exist)|column.*image_url/i.test(msg)) return "The database needs the latest update. Run supabase-all-in-one.sql in Supabase, then try again.";
+    if (/mime type|not supported|too large|exceeded the maximum/i.test(msg)) return "That photo was refused. Use a JPG, PNG or WebP under 5 MB.";
+    if (/Invalid login/i.test(msg)) return "Wrong email or password.";
+    if (/Failed to fetch|NetworkError/i.test(msg)) return "Cannot reach the server. Check your internet connection.";
+    return msg || "Something went wrong. Please try again.";
+  }
+
+  let toastTimer;
+  function toast(message, kind) {
+    let el = document.getElementById("toast");
+    if (!el) { el = document.createElement("div"); el.id = "toast"; el.className = "toast"; el.setAttribute("role", "status"); document.body.appendChild(el); }
+    el.textContent = message;
+    el.className = "toast show" + (kind === "error" ? " error" : "");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.className = "toast"; }, 4200);
+  }
+
+  function setupBanner() {
+    const el = document.createElement("div");
+    el.className = "setup-banner";
+    el.innerHTML = "<strong>Database not connected yet.</strong> Open <code>config.js</code> and paste your Supabase Project URL and publishable key.";
+    document.body.prepend(el);
+  }
+
+  async function getSettings() {
+    const { data, error } = await db.from("settings").select("*").eq("id", 1).single();
+    if (error) throw error;
+    return data;
+  }
+
+  /* ---------- Cart (kept in this browser; orders are saved with place_order) ---------- */
+  const CART_KEY = "tamer_cart_v1";
+  const cart = {
+    load() { try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch (e) { return []; } },
+    save(items) { try { localStorage.setItem(CART_KEY, JSON.stringify(items)); } catch (e) { /* storage blocked */ } cart.badge(); },
+    count() { return cart.load().reduce((n, i) => n + i.qty, 0); },
+    total() { return cart.load().reduce((n, i) => n + i.qty * i.price, 0); },
+    add(p) {
+      const items = cart.load(); const found = items.find((i) => i.id === p.id);
+      if (found) found.qty = Math.min(20, found.qty + 1); else items.push({ id: p.id, name: p.name, price: p.price, qty: 1 });
+      cart.save(items); toast(p.name + " added to cart");
+    },
+    badge() { document.querySelectorAll(".cart-count").forEach((el) => { el.textContent = cart.count(); }); },
+    open() {
+      let dlg = document.getElementById("cart-dialog");
+      if (!dlg) {
+        dlg = document.createElement("dialog"); dlg.id = "cart-dialog"; dlg.className = "cart-dialog";
+        dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
+        dlg.addEventListener("click", cart.onClick);
+        dlg.addEventListener("submit", cart.onSubmit);
+        document.body.appendChild(dlg);
+      }
+      cart.render(dlg); dlg.showModal();
+    },
+    render(dlg) {
+      const items = cart.load();
+      if (!items.length) { dlg.innerHTML = '<div class="cart-box"><h2>Your cart</h2><p class="muted">Your cart is empty.</p><button class="btn btn-outline" data-cart="close" type="button">Close</button></div>'; return; }
+      dlg.innerHTML = '<form class="cart-box" method="dialog" id="cart-form"><h2>Your cart</h2><ul class="cart-list">' +
+        items.map((i) => '<li><span>' + esc(i.name) + '<small>' + money(i.price) + ' each</small></span><span class="qty"><button type="button" data-cart="minus" data-id="' + esc(i.id) + '" aria-label="Fewer">&minus;</button>' + i.qty + '<button type="button" data-cart="plus" data-id="' + esc(i.id) + '" aria-label="More">+</button></span></li>').join("") +
+        '</ul><p class="cart-total">Total <strong>' + money(cart.total()) + '</strong></p>' +
+        '<p class="muted">Reserve these for pickup and pay at the shop. The total is confirmed when you reserve.</p>' +
+        '<div class="field"><label for="c-name">Your name *</label><input id="c-name" required></div>' +
+        '<div class="field"><label for="c-phone">Phone number *</label><input id="c-phone" type="tel" required></div>' +
+        '<div class="cart-actions"><button class="btn" type="submit">Reserve for pickup</button><button class="btn btn-outline" type="button" data-cart="close">Close</button></div></form>';
+    },
+    onClick(e) {
+      const b = e.target.closest("[data-cart]"); if (!b) return;
+      const dlg = document.getElementById("cart-dialog"); const act = b.dataset.cart;
+      if (act === "close") return dlg.close();
+      const items = cart.load(); const it = items.find((i) => i.id === b.dataset.id); if (!it) return;
+      it.qty += act === "plus" ? 1 : -1;
+      cart.save(items.filter((i) => i.qty > 0).map((i) => ({ ...i, qty: Math.min(20, i.qty) })));
+      cart.render(dlg);
+    },
+    async onSubmit(e) {
+      e.preventDefault(); if (!db) return;
+      const dlg = document.getElementById("cart-dialog");
+      const btn = dlg.querySelector('[type="submit"]'); btn.disabled = true;
+      const { error } = await db.rpc("place_order", {
+        p_name: dlg.querySelector("#c-name").value, p_phone: dlg.querySelector("#c-phone").value,
+        p_items: cart.load().map((i) => ({ id: i.id, qty: i.qty }))
+      });
+      btn.disabled = false;
+      if (error) return toast(friendly(error), "error");
+      cart.save([]); dlg.close(); toast("Reserved! We will have it ready for pickup.");
+      if (window.onOrderPlaced) window.onOrderPlaced();
+    }
+  };
+
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("#cart-btn"); if (b) { e.preventDefault(); cart.open(); }
+  });
+  // Your own logo: save it as images/logo.png (next to index.html). It replaces the "TAMER" badge everywhere.
+  const LOGO = "images/logo.png";
+  function applyLogo() {
+    const img = new Image();
+    img.onload = () => document.querySelectorAll(".logo").forEach((el) => { el.classList.add("has-logo"); el.style.backgroundImage = "url('" + LOGO + "')"; });
+    img.src = LOGO;   // if the file does not exist nothing changes and the text badge stays
+  }
+  document.addEventListener("DOMContentLoaded", () => { cart.badge(); applyLogo(); if (!db) setupBanner(); });
+
+  window.App = { db, cssImg, esc, money, initials, DAYS, DAY_NAMES, fmtTime, toMin, fromMin, fmtDate, isoOf, addDays, weekdayKey, shopNow, absMinutes, friendly, toast, getSettings, cart };
+})();
+
+/* Admin dashboard: login + live data from the database. */
+(function () {
+  const A = App, { db, esc, money, initials, fmtTime, fmtDate, toMin, DAYS, DAY_NAMES, shopNow, friendly, toast } = A;
+  const $ = (s, r = document) => r.querySelector(s);
+  const app = $("#app"), loginBox = $("#login");
+  if (!db) { loginBox.hidden = false; $("#login-msg").textContent = "Database not connected yet. Fill in config.js first."; return; }
+
+  const S = { services: [], barbers: [], products: [], coupons: [], appointments: [], orders: [], settings: null,
+              ui: { svcQ: "", apptQ: "", apptBarber: "all", apptPage: 1, prodQ: "", prodMode: "grid", month: null, daysOff: [] } };
+  let started = false;
+  const PAGE = 10;
+  const COLORS = ["#c8a951", "#b5222b", "#4fbf7f", "#4a7bd0", "#888888", "#9b6bd1"];
+  const todayISO = () => shopNow(S.settings ? S.settings.timezone : undefined).date;
+  const icon = (n) => '<svg class="i"><use href="#i-' + n + '"/></svg>';
+
+  /* ---------- Loading ---------- */
+  async function load() {
+    const q = (t, o) => db.from(t).select("*").order(o.col, { ascending: !!o.asc });
+    const [sv, bb, pr, cp, ap, od, st] = await Promise.all([
+      q("services", { col: "created_at", asc: true }), q("barbers", { col: "created_at", asc: true }), q("products", { col: "created_at", asc: true }),
+      q("coupons", { col: "code", asc: true }), db.from("appointments").select("*").order("appt_date", { ascending: false }).order("appt_time", { ascending: false }),
+      q("orders", { col: "created_at" }), db.from("settings").select("*").eq("id", 1).single()]);
+    const bad = [sv, bb, pr, cp, ap, od, st].find((r) => r.error);
+    if (bad) throw bad.error;
+    Object.assign(S, { services: sv.data, barbers: bb.data, products: pr.data, coupons: cp.data, appointments: ap.data, orders: od.data, settings: st.data });
+    if (!S.ui.month) { const t = todayISO(); S.ui.month = t.slice(0, 7); S.ui.daysOff = [...S.settings.days_off]; }
+  }
+  async function reload() { await load(); renderAll(); }
+  async function mutate(promise, okMsg) {
+    const { error } = await promise;
+    if (error) { toast(friendly(error), "error"); return false; }
+    if (okMsg) toast(okMsg);
+    try { await reload(); } catch (e) { toast(friendly(e), "error"); }
+    return true;
+  }
+
+  /* ---------- Overview ---------- */
+  const monthShift = (ym, n) => { const [y, m] = ym.split("-").map(Number); const d = new Date(y, m - 1 + n, 1); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0"); };
+  const trend = (cur, prev) => (prev > 0 ? ((cur - prev) / prev >= 0 ? "+" : "") + (((cur - prev) / prev) * 100).toFixed(1).replace(/\.0$/, "") + "%" : "");
+  // Top of the revenue chart: grows with your revenue (from 100k DZD up to any amount, 20 million and beyond),
+  // always using round tick steps such as 5M, 10M, 15M, 20M.
+  function niceTop(v) {
+    const need = Math.max(v, 100000) / 4, mag = Math.pow(10, Math.floor(Math.log10(need)));
+    return [1, 2, 2.5, 5, 10].map((k) => k * mag).find((x) => x >= need - 1e-9) * 4;
+  }
+  const axis = (v) => (v >= 1e6 ? +(v / 1e6).toFixed(1) + "M" : v >= 1000 ? +(v / 1000).toFixed(1) + "k" : String(v));
+
+  function renderOverview() {
+    const today = todayISO(), ym = today.slice(0, 7), prevYm = monthShift(ym, -1), yest = A.addDays(today, -1);
+    const ap = S.appointments, live = ap.filter((a) => a.status !== "cancelled"), done = ap.filter((a) => a.status === "completed");
+    const rev = (m) => done.filter((a) => a.appt_date.startsWith(m)).reduce((n, a) => n + Number(a.price), 0);
+    const cnt = (m) => done.filter((a) => a.appt_date.startsWith(m)).length;
+    const todayN = live.filter((a) => a.appt_date === today).length, yestN = live.filter((a) => a.appt_date === yest).length;
+    const stat = (ico, t, val, label) => '<div class="card stat"><div class="top"><div class="ico">' + icon(ico) + '</div><span class="trend">' + esc(t) + "</span></div><strong>" + esc(val) + "</strong><span>" + esc(label) + "</span></div>";
+
+    const months = Array.from({ length: 6 }, (_, i) => monthShift(ym, i - 5));
+    const vals = months.map(rev), top = niceTop(Math.max(...vals));
+    const X = (i) => 70 + i * 94, Y = (v) => 188 - (v / top) * 168;
+    let line = "M" + X(0) + " " + Y(vals[0]);
+    for (let i = 1; i < 6; i++) { const mx = (X(i - 1) + X(i)) / 2; line += " C" + mx + " " + Y(vals[i - 1]) + " " + mx + " " + Y(vals[i]) + " " + X(i) + " " + Y(vals[i]); }
+    const grid = [0, 1, 2, 3, 4].map((k) => { const y = 188 - k * 42; return '<line x1="48" y1="' + y + '" x2="548" y2="' + y + '"/>'; }).join("");
+    const ylab = [0, 1, 2, 3, 4].map((k) => '<text x="40" y="' + (192 - k * 42) + '">' + axis((top / 4) * k) + "</text>").join("");
+    const xlab = months.map((m, i) => '<text x="' + X(i) + '" y="250">' + new Date(+m.slice(0, 4), +m.slice(5) - 1, 1).toLocaleDateString("en-US", { month: "short" }) + "</text>").join("");
+
+    const byCat = {};
+    live.forEach((a) => { const s = S.services.find((x) => x.id === a.service_id); const c = s ? s.category : "Other"; byCat[c] = (byCat[c] || 0) + 1; });
+    const total = live.length, cats = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
+    let acc = 0;
+    const stops = cats.map(([, n], i) => { const from = acc; acc += (n / total) * 100; return COLORS[i % COLORS.length] + " " + from + "% " + acc + "%"; }).join(", ");
+    const legend = cats.map(([c, n], i) => '<li><i style="background:' + COLORS[i % COLORS.length] + '"></i>' + esc(c) + "<b>" + Math.round((n / total) * 100) + "%</b></li>").join("");
+
+    $("#ov").innerHTML =
+      '<div class="grid g4">' + stat("cal", trend(todayN, yestN), todayN, "Today's Appointments") + stat("dollar", trend(rev(ym), rev(prevYm)), money(rev(ym)), "Revenue This Month") +
+      stat("scissors", trend(cnt(ym), cnt(prevYm)), cnt(ym), "Services Completed") + stat("users", "", new Set(ap.map((a) => a.phone)).size, "Total Customers") + "</div>" +
+      '<div class="grid charts"><div class="card"><div class="card-head"><h3>Revenue Overview</h3><span class="chip">Last 6 months &middot; DZD</span></div>' +
+      '<svg class="chart-svg" viewBox="0 0 560 260" role="img" aria-label="Revenue from completed appointments, last 6 months"><g stroke="#333">' + grid + '</g><g fill="#8f8a80" font-size="11" text-anchor="end">' + ylab + '</g><g fill="#8f8a80" font-size="11" text-anchor="middle">' + xlab + "</g>" +
+      '<path d="' + line + " L" + X(5) + " 188 L" + X(0) + ' 188 Z" fill="rgba(200,169,81,.16)"/><path d="' + line + '" fill="none" stroke="#c8a951" stroke-width="2.5"/></svg>' +
+      (Math.max(...vals) === 0 ? '<p class="muted">Revenue appears here once appointments are marked Done.</p>' : "") + "</div>" +
+      '<div class="card"><div class="card-head"><h3>Services Breakdown</h3></div><div class="donut-wrap"><div class="donut"' + (total ? ' style="background:conic-gradient(' + stops + ')"' : ' style="background:#333"') + ' role="img" aria-label="Share of bookings by service type"></div>' +
+      (total ? '<ul class="legend">' + legend + "</ul>" : '<p class="muted">No bookings yet.</p>') + "</div></div></div>";
+  }
+
+  /* ---------- Services ---------- */
+  function renderServices() {
+    const q = S.ui.svcQ.toLowerCase();
+    const list = S.services.filter((s) => (s.name + " " + s.category).toLowerCase().includes(q));
+    $("#svc-list").innerHTML = list.length ? list.map((s) =>
+      '<article class="card svc">' + (s.image_url ? '<div class="svc-img" style="' + A.cssImg(s.image_url) + '" role="img" aria-label="' + esc(s.name) + '"></div>' : "") + '<div class="row"><div><span class="tag">' + esc(s.category) + "</span><h3>" + esc(s.name) + '</h3></div><div><div class="price">' + money(s.price) + '</div><div class="dur">' + s.duration + 'min</div></div></div><p class="desc">' + esc(s.description) + "</p>" +
+      '<div class="foot"><button type="button" class="status' + (s.active ? "" : " off") + '" data-act="svc-toggle" data-id="' + s.id + '" aria-pressed="' + s.active + '">' + (s.active ? "Active" : "Hidden") + "</button>" +
+      '<button class="icon-btn" type="button" data-act="svc-edit" data-id="' + s.id + '" aria-label="Edit ' + esc(s.name) + '">' + icon("edit") + '</button><button class="icon-btn" type="button" data-act="svc-del" data-id="' + s.id + '" aria-label="Delete ' + esc(s.name) + '">' + icon("trash") + "</button></div></article>").join("")
+      : '<p class="muted">' + (S.services.length ? "No services match your search." : "No services yet. Click Add Service.") + "</p>";
+  }
+  const serviceFields = (v = {}) =>
+    fieldHtml("name", "Service Name *", "text", v.name, { ph: "e.g. Fade & Taper" }) +
+    fieldHtml("category", "Category *", "text", v.category || "Hair", { list: ["Hair", "Beard", "Shave", "Color", "Combo"] }) +
+    fieldHtml("price", "Price (DZD) *", "number", v.price, { ph: "800", step: "1", min: 0 }) +
+    fieldHtml("duration", "Duration (minutes) *", "number", v.duration, { ph: "30", min: 5, step: 5 }) +
+    fieldHtml("description", "Description", "textarea", v.description, { full: true, ph: "Short service description..." }) +
+    imageField("image_url", "Photo (optional)", v.image_url, "services");
+  function openService(s) {
+    openModal({ title: s ? "Edit Service" : "Add New Service", submit: s ? "Save Service" : "Add Service", body: serviceFields(s || {}),
+      async onSubmit(fd) {
+        const row = { name: str(fd, "name"), category: str(fd, "category") || "Hair", price: num(fd, "price"), duration: Math.round(num(fd, "duration")), description: str(fd, "description"), image_url: str(fd, "image_url") };
+        if (!row.name || !(row.price >= 0) || !(row.duration > 0)) return fail("Please fill in the name, price and duration.");
+        return mutate(s ? db.from("services").update(row).eq("id", s.id) : db.from("services").insert(row), s ? "Service saved" : "Service added");
+      } });
+  }
+
+  /* ---------- Appointments ---------- */
+  const STATUS = { pending: ["Pending", "pill-amber"], confirmed: ["Confirmed", "pill-green"], completed: ["Completed", "pill-grey"], cancelled: ["Cancelled", "pill-red"] };
+  function renderAppointments() {
+    const q = S.ui.apptQ.toLowerCase(), all = S.appointments;
+    const rank = {}; [...all].sort((a, b) => a.created_at.localeCompare(b.created_at)).forEach((a, i) => { rank[a.id] = i + 1; });
+    const byQ = all.filter((a) => (a.customer_name + " " + a.phone).toLowerCase().includes(q));
+    const rows = byQ.filter((a) => S.ui.apptBarber === "all" || a.barber_id === S.ui.apptBarber);
+    const pill = (id, label, n) => '<button type="button" class="' + (S.ui.apptBarber === id ? "on" : "") + '" data-act="appt-barber" data-id="' + id + '">' + esc(label) + " (" + n + ")</button>";
+    $("#appt-filter").innerHTML = pill("all", "All Barbers", byQ.length) + S.barbers.map((b) => pill(b.id, b.name.split(" ")[0], byQ.filter((a) => a.barber_id === b.id).length)).join("");
+    const pages = Math.max(1, Math.ceil(rows.length / PAGE)); S.ui.apptPage = Math.min(S.ui.apptPage, pages);
+    const slice = rows.slice((S.ui.apptPage - 1) * PAGE, S.ui.apptPage * PAGE);
+    const btn = (act, cls, label, id) => '<button type="button" class="mini ' + cls + '" data-act="' + act + '" data-id="' + id + '">' + label + "</button> ";
+    $("#appt-table").innerHTML = '<div class="table-wrap"><table><thead><tr><th>#</th><th>Customer</th><th>Phone</th><th>Service</th><th>Barber</th><th>Date</th><th>Time</th><th>Status</th><th>Actions</th></tr></thead><tbody>' +
+      (slice.length ? slice.map((a) => { const live = a.status === "pending" || a.status === "confirmed"; const [lab, cls] = STATUS[a.status];
+        return "<tr><td>#" + rank[a.id] + "</td><td>" + esc(a.customer_name) + (a.notes ? "<small>" + esc(a.notes) + "</small>" : "") + "</td><td>" + esc(a.phone) + "</td><td>" + esc(a.service_name) + "</td><td>" + esc(a.barber_name) + "</td><td>" + esc(a.appt_date) + '</td><td class="time">' + esc(fmtTime(a.appt_time)) + '</td><td><span class="pill ' + cls + '">' + lab + "</span></td><td>" +
+          (a.status === "pending" ? btn("appt-confirmed", "done", "Confirm", a.id) : "") + (live ? btn("appt-completed", "done", "Done", a.id) + btn("appt-cancelled", "cancel", "Cancel", a.id) : "") +
+          '<button class="icon-btn" type="button" data-act="appt-del" data-id="' + a.id + '" aria-label="Delete appointment">' + icon("trash") + "</button></td></tr>"; }).join("")
+        : '<tr><td colspan="9" class="muted">No appointments found.</td></tr>') +
+      '</tbody></table><div class="table-foot"><span>Showing ' + slice.length + " of " + rows.length + ' appointments</span><div class="page-btns">' +
+      '<button type="button" data-act="appt-page" data-d="-1"' + (S.ui.apptPage <= 1 ? " disabled" : "") + '>Previous</button><span class="on">' + S.ui.apptPage + '</span><button type="button" data-act="appt-page" data-d="1"' + (S.ui.apptPage >= pages ? " disabled" : "") + ">Next</button></div></div></div>";
+  }
+  function openAppointment() {
+    if (!S.services.length || !S.barbers.length) return toast("Add at least one service and one barber first.", "error");
+    openModal({ title: "New Appointment", submit: "Book Appointment",
+      body: fieldHtml("name", "Customer Name *", "text", "", { ph: "John Smith" }) + fieldHtml("phone", "Phone * (10 digits)", "tel", "", { ph: "0555123456" }) +
+        fieldHtml("service", "Service *", "select", "", { full: true, opts: S.services.map((s) => [s.id, s.name + " (" + money(s.price) + ")"]) }) +
+        fieldHtml("barber", "Barber *", "select", "", { full: true, opts: S.barbers.map((b) => [b.id, b.name]) }) +
+        fieldHtml("date", "Date *", "date", todayISO()) + fieldHtml("time", "Time *", "time", ""),
+      async onSubmit(fd) {
+        const sv = S.services.find((s) => s.id === fd.get("service")), bb = S.barbers.find((b) => b.id === fd.get("barber"));
+        const date = fd.get("date"), time = fd.get("time");
+        if (!str(fd, "name") || !str(fd, "phone") || !date || !time) return fail("Please fill in every required field.");
+        if (!/^0\d{9}$/.test(str(fd, "phone"))) return fail("Phone must be 10 digits, like 0555123456.");
+        const s0 = toMin(time), e0 = s0 + sv.duration;
+        const clash = S.appointments.some((a) => a.barber_id === bb.id && a.appt_date === date && (a.status === "pending" || a.status === "confirmed") && toMin(a.appt_time) < e0 && s0 < toMin(a.appt_time) + a.duration_min);
+        if (clash && !confirm(bb.name + " already has an appointment that overlaps this time. Book anyway?")) return false;
+        return mutate(db.from("appointments").insert({ customer_name: str(fd, "name"), phone: str(fd, "phone"), service_id: sv.id, barber_id: bb.id, service_name: sv.name, barber_name: bb.name, duration_min: sv.duration, price: sv.price, appt_date: date, appt_time: time, status: "confirmed" }), "Appointment booked");
+      } });
+  }
+
+  /* ---------- Products + orders ---------- */
+  const unitPrice = (p) => Math.round(p.price * (100 - p.discount)) / 100;
+  function renderProducts() {
+    const q = S.ui.prodQ.toLowerCase(), list = S.products.filter((p) => (p.name + " " + p.brand + " " + p.category).toLowerCase().includes(q));
+    const el = $("#prod-list"); el.classList.toggle("list-mode", S.ui.prodMode === "list");
+    el.innerHTML = list.length ? list.map((p) =>
+      '<article class="card product"><div class="img"' + (p.image_url ? ' style="background-image:url(\'' + esc(p.image_url) + '\')"' : "") + ">" + (p.discount ? '<span class="badge-off">' + p.discount + "% OFF</span>" : "") +
+      '<span class="pill ' + (p.published ? "pill-green" : "pill-grey") + ' badge-pub">' + (p.published ? "Published" : "Draft") + "</span></div>" +
+      '<div class="body"><span class="brand-name">' + esc(p.brand) + "</span><h3>" + esc(p.name) + '</h3><span class="cat">' + esc(p.category) + '</span><span class="price">' + (p.discount ? "<s>" + money(p.price) + "</s>" : "") + "<b>" + money(unitPrice(p)) + '</b></span><span class="stock">' + p.stock + " in stock</span></div>" +
+      '<div class="actions"><button class="btn btn-ghost btn-block" type="button" data-act="prod-edit" data-id="' + p.id + '">' + icon("edit") + 'Edit</button><button class="btn btn-danger" type="button" data-act="prod-del" data-id="' + p.id + '" aria-label="Delete ' + esc(p.name) + '">' + icon("trash") + "</button></div></article>").join("")
+      : '<p class="muted">' + (S.products.length ? "No products match your search." : "No products yet. Click Add Product.") + "</p>";
+
+    const ORD = { new: "New", ready: "Ready for pickup", picked_up: "Picked up", cancelled: "Cancelled" };
+    $("#order-table").innerHTML = S.orders.length ? '<div class="table-wrap"><table><thead><tr><th>Date</th><th>Customer</th><th>Phone</th><th>Items</th><th>Total</th><th>Status</th></tr></thead><tbody>' +
+      S.orders.map((o) => "<tr><td>" + esc(new Date(o.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })) + "</td><td>" + esc(o.customer_name) + "</td><td>" + esc(o.phone) + "</td><td>" + o.items.map((i) => esc(i.name) + " &times; " + i.qty).join("<br>") + "</td><td>" + money(o.total) + '</td><td><select class="mini-select" data-order="' + o.id + '" aria-label="Order status">' +
+        Object.entries(ORD).map(([k, v]) => '<option value="' + k + '"' + (o.status === k ? " selected" : "") + ">" + v + "</option>").join("") + "</select></td></tr>").join("") + "</tbody></table></div>"
+      : '<p class="muted">No pickup orders yet.</p>';
+  }
+  function openProduct(p) {
+    const v = p || { discount: 0, stock: 0, published: true };
+    openModal({ title: p ? "Edit Product" : "Add Product", submit: p ? "Save Product" : "Add Product",
+      body: fieldHtml("name", "Product Name *", "text", v.name, { full: true, ph: "Premium Beard Oil" }) + fieldHtml("brand", "Brand", "text", v.brand, { ph: "Brand name" }) +
+        fieldHtml("category", "Category", "text", v.category || "Hair", { list: ["Hair", "Beard", "Skincare", "Accessories"] }) +
+        fieldHtml("price", "Price (DZD) *", "number", v.price, { ph: "2500", step: "1", min: 0 }) + fieldHtml("discount", "Discount (%)", "number", v.discount, { min: 0, step: 1 }) +
+        fieldHtml("stock", "Stock", "number", v.stock, { min: 0, step: 1 }) + fieldHtml("published", "Status", "select", v.published ? "1" : "0", { opts: [["1", "Published"], ["0", "Draft"]] }) +
+        imageField("image_url", "Photo (optional)", v.image_url, "products"),
+      async onSubmit(fd) {
+        const row = { name: str(fd, "name"), brand: str(fd, "brand"), category: str(fd, "category") || "Hair", price: num(fd, "price"), discount: Math.round(num(fd, "discount") || 0), stock: Math.round(num(fd, "stock") || 0), published: fd.get("published") === "1", image_url: str(fd, "image_url") };
+        if (!row.name || !(row.price >= 0)) return fail("Please fill in the product name and price.");
+        if (row.discount < 0 || row.discount > 100) return fail("Discount must be between 0 and 100.");
+        return mutate(p ? db.from("products").update(row).eq("id", p.id) : db.from("products").insert(row), p ? "Product saved" : "Product added");
+      } });
+  }
+
+  /* ---------- Team ---------- */
+  function renderTeam() {
+    $("#team-list").innerHTML = S.barbers.length ? S.barbers.map((b) => {
+      const days = DAYS.filter((d) => b.schedule[d] && b.schedule[d].on);
+      const week = DAYS.map((d) => { const x = b.schedule[d]; return x && x.on ? '<div class="on">' + esc(DAY_NAMES[d][0]) + "<small>" + x.start.slice(0, 2) + "<br>" + x.end.slice(0, 2) + "</small></div>" : '<div class="off">' + esc(DAY_NAMES[d][0]) + "</div>"; }).join("");
+      return '<article class="card member"><div class="top"><div class="avatar"' + (b.photo_url ? ' style="background:url(\'' + esc(b.photo_url) + '\') center/cover;color:transparent"' : "") + ">" + esc(initials(b.name)) + "</div><div><h3>" + esc(b.name) + '</h3><div class="role">' + esc(b.title) + '</div><div class="meta"><span>&#9733; ' + Number(b.rating) + "</span><span>" + b.cuts + " cuts</span><span>" + esc(b.phone) + "</span></div></div>" +
+        '<button type="button" class="pill ' + (b.active ? "pill-green" : "pill-grey") + ' pill-btn" data-act="barber-toggle" data-id="' + b.id + '" aria-pressed="' + b.active + '">' + (b.active ? "Active" : "Inactive") + "</button></div>" +
+        (b.skills.length ? '<div class="skills">' + b.skills.map((k) => "<span>" + esc(k) + "</span>").join("") + "</div>" : "") +
+        '<div class="sched-head"><span>Weekly schedule</span><button type="button" class="link-btn" data-act="barber-sched" data-id="' + b.id + '">Edit</button></div><div class="week">' + week + "</div>" +
+        '<p class="works">' + (days.length ? "Works " + days.length + " days: " + days.map((d) => DAY_NAMES[d]).join(", ") : "Not working any day") + "</p>" +
+        '<div class="member-actions"><button class="btn btn-ghost" type="button" data-act="barber-edit" data-id="' + b.id + '">' + icon("edit") + 'Edit profile</button><button class="btn btn-danger" type="button" data-act="barber-del" data-id="' + b.id + '">' + icon("trash") + "Delete</button></div></article>";
+    }).join("") : '<p class="muted">No barbers yet. Click Add Barber.</p>';
+  }
+  function openBarber(b) {
+    const v = b || { rating: 5, cuts: 0, years_exp: 1, skills: [] };
+    openModal({ title: b ? "Edit Barber" : "Add Barber", submit: b ? "Save Barber" : "Add Barber",
+      body: fieldHtml("name", "Full Name *", "text", v.name) + fieldHtml("title", "Specialty", "text", v.title, { ph: "e.g. Fades & Designs" }) + fieldHtml("phone", "Phone", "tel", v.phone) +
+        fieldHtml("years_exp", "Years of experience", "number", v.years_exp, { min: 0, step: 1 }) + fieldHtml("rating", "Rating (0-5)", "number", v.rating, { min: 0, step: "0.1" }) + fieldHtml("cuts", "Total cuts", "number", v.cuts, { min: 0, step: 1 }) +
+        fieldHtml("skills", "Skills (separate with commas)", "text", (v.skills || []).join(", "), { full: true }) + fieldHtml("bio", "Short bio", "textarea", v.bio, { full: true }) + imageField("photo_url", "Photo (optional)", v.photo_url, "barbers"),
+      async onSubmit(fd) {
+        const rating = num(fd, "rating");
+        const row = { name: str(fd, "name"), title: str(fd, "title") || "Barber", phone: str(fd, "phone"), years_exp: Math.round(num(fd, "years_exp") || 0), rating: rating >= 0 && rating <= 5 ? rating : 5, cuts: Math.round(num(fd, "cuts") || 0), skills: str(fd, "skills").split(",").map((x) => x.trim()).filter(Boolean), bio: str(fd, "bio"), photo_url: str(fd, "photo_url") };
+        if (!row.name) return fail("Please enter the barber's name.");
+        return mutate(b ? db.from("barbers").update(row).eq("id", b.id) : db.from("barbers").insert(row), b ? "Barber saved" : "Barber added");
+      } });
+  }
+  function openSchedule(b) {
+    const body = DAYS.map((d) => { const x = b.schedule[d] || { on: false, start: "09:00", end: "18:00" };
+      return '<div class="sched-row full"><label class="check"><input type="checkbox" name="on_' + d + '"' + (x.on ? " checked" : "") + "> " + esc(DAY_NAMES[d]) + '</label><input type="time" name="start_' + d + '" value="' + x.start + '" aria-label="' + DAY_NAMES[d] + ' start"><span>to</span><input type="time" name="end_' + d + '" value="' + x.end + '" aria-label="' + DAY_NAMES[d] + ' end"></div>';
+    }).join("");
+    openModal({ title: b.name + ": weekly schedule", submit: "Save Schedule", body,
+      async onSubmit(fd) {
+        const schedule = {};
+        for (const d of DAYS) {
+          const on = fd.get("on_" + d) === "on", start = fd.get("start_" + d), end = fd.get("end_" + d);
+          if (on && (!start || !end || toMin(end) <= toMin(start))) return fail(DAY_NAMES[d] + ": the end time must be after the start time.");
+          schedule[d] = { on, start: start || "09:00", end: end || "18:00" };
+        }
+        return mutate(db.from("barbers").update({ schedule }).eq("id", b.id), "Schedule saved");
+      } });
+  }
+
+  /* ---------- Coupons ---------- */
+  function renderCoupons() {
+    $("#coupon-list").innerHTML = S.coupons.length ? S.coupons.map((c) => {
+      const expired = c.expires_on && c.expires_on < todayISO(), full = c.used >= c.max_uses, on = c.active && !expired && !full;
+      const desc = (c.kind === "percent" ? c.value + "% off" : money(c.value) + " off") + (c.min_order > 0 ? " &middot; min " + money(c.min_order) : "");
+      return '<article class="card coupon' + (on ? "" : " paused") + '"><div class="row"><code>' + esc(c.code) + '</code><button type="button" class="pill pill-btn ' + (on ? "pill-green" : "pill-grey") + '" data-act="coupon-toggle" data-id="' + c.id + '" aria-pressed="' + c.active + '">' + (expired ? "Expired" : on ? "Active" : "Paused") + "</button></div>" +
+        "<small>" + desc + "</small><small>Used: " + c.used + "/" + c.max_uses + (c.expires_on ? " &middot; Expires: " + esc(c.expires_on) : "") + '</small><div class="meter' + (full ? " full" : "") + '"><i style="width:' + Math.min(100, (c.used / c.max_uses) * 100) + '%"></i></div>' +
+        '<div class="foot" style="justify-content:space-between"><small style="color:var(--gold)">' + (full ? "Limit reached" : "") + '</small><span><button class="icon-btn" type="button" data-act="coupon-edit" data-id="' + c.id + '" aria-label="Edit ' + esc(c.code) + '">' + icon("edit") + '</button><button class="icon-btn" type="button" data-act="coupon-del" data-id="' + c.id + '" aria-label="Delete ' + esc(c.code) + '">' + icon("trash") + "</button></span></div></article>";
+    }).join("") : '<p class="muted">No coupons yet. Click Create Coupon.</p>';
+  }
+  function openCoupon(c) {
+    const v = c || { kind: "percent", max_uses: 100, min_order: 0 };
+    openModal({ title: c ? "Edit Coupon" : "Create Coupon", submit: c ? "Save Coupon" : "Create Coupon",
+      body: fieldHtml("code", "Code *", "text", v.code, { ph: "WELCOME20" }) + fieldHtml("kind", "Type", "select", v.kind, { opts: [["percent", "Percent off"], ["amount", "Dollar amount off"]] }) +
+        fieldHtml("value", "Value * (percent, or DZD)", "number", v.value, { min: 0, step: "0.01" }) + fieldHtml("min_order", "Minimum order (DZD)", "number", v.min_order, { min: 0, step: "0.01" }) +
+        fieldHtml("max_uses", "Maximum uses", "number", v.max_uses, { min: 1, step: 1 }) + fieldHtml("expires_on", "Expires on", "date", v.expires_on || ""),
+      async onSubmit(fd) {
+        const row = { code: str(fd, "code").toUpperCase().replace(/\s+/g, ""), kind: fd.get("kind"), value: num(fd, "value"), min_order: num(fd, "min_order") || 0, max_uses: Math.round(num(fd, "max_uses") || 1), expires_on: fd.get("expires_on") || null };
+        if (!row.code || !(row.value > 0)) return fail("Please enter a code and a value above 0.");
+        if (row.kind === "percent" && row.value > 100) return fail("A percent coupon cannot be more than 100.");
+        return mutate(c ? db.from("coupons").update(row).eq("id", c.id) : db.from("coupons").insert(row), c ? "Coupon saved" : "Coupon created");
+      } });
+  }
+
+  /* ---------- Settings ---------- */
+  function renderSettings() {
+    const s = S.settings, [y, m] = S.ui.month.split("-").map(Number), first = new Date(y, m - 1, 1), n = new Date(y, m, 0).getDate(), lead = (first.getDay() + 6) % 7;
+    const cells = Array.from({ length: lead }, () => "<span></span>").join("") + Array.from({ length: n }, (_, i) => { const iso = S.ui.month + "-" + String(i + 1).padStart(2, "0");
+      return '<label><input type="checkbox" data-off="' + iso + '"' + (S.ui.daysOff.includes(iso) ? " checked" : "") + ">" + (i + 1) + "</label>"; }).join("");
+    const sw = (id, label, hint, on) => '<div class="switch-row"><div>' + label + "<small>" + hint + '</small></div><label class="switch"><input type="checkbox" id="' + id + '"' + (on ? " checked" : "") + ' aria-label="' + label + '"><span></span></label></div>';
+    $("#settings").innerHTML = '<div class="settings-head"><h1>Settings</h1><p>Configure booking rules, time slots and notifications</p></div><form class="stack" id="settings-form">' +
+      '<div class="card"><h3>Booking Rules</h3><div class="fields">' + fieldHtml("advance_days", "Advance Booking (days)", "number", s.advance_days, { min: 1 }) + fieldHtml("min_notice_hours", "Minimum Notice (hours)", "number", s.min_notice_hours, { min: 0 }) +
+      fieldHtml("timezone", "Shop time zone", "text", s.timezone, { full: true, list: ["America/New_York", "America/Chicago", "America/Denver", "America/Los_Angeles", "Europe/London", "Africa/Algiers", "Europe/Paris"] }) + "</div></div>" +
+      '<div class="card"><h3>Time Slots</h3><div class="fields">' + fieldHtml("slot_minutes", "Slot Duration (minutes)", "select", String(s.slot_minutes), { opts: [["15", "15 minutes"], ["30", "30 minutes"], ["45", "45 minutes"], ["60", "60 minutes"]] }) + fieldHtml("break_minutes", "Break Time Between Appointments (minutes)", "number", s.break_minutes, { min: 0 }) + "</div></div>" +
+      '<div class="card"><h3>Notifications</h3>' + sw("email_confirm", "Email Confirmation to Customer", "Saved as a preference. Sending emails needs an email service to be connected.", s.email_confirm) + sw("sms_confirm", "SMS Confirmation to Customer", "Saved as a preference. Sending texts needs an SMS service to be connected.", s.sms_confirm) + "</div>" +
+      '<div class="card"><h3>Days Off</h3><div class="month-nav"><button type="button" class="btn btn-ghost" data-act="month" data-d="-1" aria-label="Previous month">&larr;</button><strong>' + first.toLocaleDateString("en-US", { month: "long", year: "numeric" }) + '</strong><button type="button" class="btn btn-ghost" data-act="month" data-d="1" aria-label="Next month">&rarr;</button></div>' +
+      '<div class="dow"><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span></div><div class="days">' + cells + '</div><p class="muted">Tick the days the whole shop is closed. Customers cannot book these dates.</p></div>' +
+      '<div class="save-row"><button class="btn" type="submit">' + icon("save") + "Save All Settings</button></div></form>";
+  }
+  async function saveSettings(form) {
+    const g = (id) => form.querySelector("#f-" + id) || form.querySelector("#" + id), n = (id) => Number(g(id).value);
+    const tz = g("timezone").value.trim();
+    try { new Intl.DateTimeFormat("en", { timeZone: tz }); } catch (e) { return toast("That time zone is not valid. Example: America/New_York", "error"); }
+    const row = { advance_days: Math.round(n("advance_days")), min_notice_hours: Math.round(n("min_notice_hours")), timezone: tz, slot_minutes: Math.round(n("slot_minutes")), break_minutes: Math.round(n("break_minutes")),
+      email_confirm: g("email_confirm").checked, sms_confirm: g("sms_confirm").checked, days_off: [...new Set(S.ui.daysOff)].sort() };
+    if (!(row.advance_days >= 1) || !(row.min_notice_hours >= 0) || !(row.break_minutes >= 0)) return toast("Please check the numbers in the booking rules.", "error");
+    await mutate(db.from("settings").update(row).eq("id", 1), "Settings saved");
+  }
+
+  /* ---------- Form + modal helpers ---------- */
+  const str = (fd, k) => String(fd.get(k) || "").trim();
+  const num = (fd, k) => { const v = String(fd.get(k) || "").trim(); return v === "" ? NaN : Number(v); };
+  const fail = (msg) => { toast(msg, "error"); return false; };
+  function fieldHtml(name, label, type, value, o = {}) {
+    const id = "f-" + name, attrs = (o.ph ? ' placeholder="' + esc(o.ph) + '"' : "") + (o.min != null ? ' min="' + o.min + '"' : "") + (o.step ? ' step="' + o.step + '"' : "") + (o.list ? ' list="dl-' + name + '"' : "");
+    let control;
+    if (type === "textarea") control = '<textarea id="' + id + '" name="' + name + '"' + attrs + ">" + esc(value) + "</textarea>";
+    else if (type === "select") control = '<select id="' + id + '" name="' + name + '">' + o.opts.map(([v, l]) => '<option value="' + esc(v) + '"' + (String(v) === String(value) ? " selected" : "") + ">" + esc(l) + "</option>").join("") + "</select>";
+    else control = '<input id="' + id + '" name="' + name + '" type="' + type + '" value="' + esc(value ?? "") + '"' + attrs + ">" + (o.list ? '<datalist id="dl-' + name + '">' + o.list.map((x) => '<option value="' + esc(x) + '">').join("") + "</datalist>" : "");
+    return '<div class="field' + (o.full ? " full" : "") + '"><label for="' + id + '">' + esc(label) + "</label>" + control + "</div>";
+  }
+  /* ----- Photo upload (stored in Supabase Storage, bucket "images") ----- */
+  const BUCKET = "images";
+  function imageField(name, label, value, folder) {
+    return '<div class="field full imgfield" data-folder="' + folder + '"><label>' + esc(label) + '</label><div class="img-row"><div class="img-preview"' + (value ? ' style="' + A.cssImg(value) + '"' : "") + '></div><div class="img-ctl">' +
+      '<label class="btn btn-ghost btn-file">Choose photo<input type="file" accept="image/jpeg,image/png,image/webp,image/gif" data-upload="' + name + '"></label> ' +
+      '<button type="button" class="link-btn" data-remove-img="1"' + (value ? "" : " hidden") + '>Remove photo</button><small class="hint">JPG, PNG or WebP. Big photos are shrunk automatically.</small></div></div>' +
+      '<input type="hidden" name="' + name + '" value="' + esc(value || "") + '"></div>';
+  }
+  async function shrink(file) {                       // resize to at most 1200 px so the site stays fast
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type)) return file;
+    try {
+      const bmp = await createImageBitmap(file), k = Math.min(1, 1200 / Math.max(bmp.width, bmp.height));
+      const cv = document.createElement("canvas"); cv.width = Math.round(bmp.width * k); cv.height = Math.round(bmp.height * k);
+      const ctx = cv.getContext("2d"); ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, cv.width, cv.height); ctx.drawImage(bmp, 0, 0, cv.width, cv.height);
+      return (await new Promise((r) => cv.toBlob(r, "image/jpeg", 0.85))) || file;
+    } catch (e) { return file; }
+  }
+  async function uploadImage(file, folder) {
+    if (file.size > 20 * 1024 * 1024) throw new Error("That photo is too large (over 20 MB).");
+    const blob = await shrink(file);
+    if (blob.size > 5 * 1024 * 1024) throw new Error("That photo is too large (over 5 MB).");
+    const ext = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp", "image/gif": "gif" }[blob.type] || "jpg";
+    const id = window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now() + "-" + Math.random().toString(16).slice(2);
+    const path = folder + "/" + id + "." + ext;
+    const { error } = await db.storage.from(BUCKET).upload(path, blob, { contentType: blob.type, cacheControl: "31536000", upsert: false });
+    if (error) throw error;
+    return db.storage.from(BUCKET).getPublicUrl(path).data.publicUrl;
+  }
+  $("#modal-body").addEventListener("change", async (e) => {
+    const inp = e.target.closest("[data-upload]"); if (!inp || !inp.files[0]) return;
+    const box = inp.closest(".imgfield"), submit = $("#modal-submit"), hint = box.querySelector(".hint");
+    submit.disabled = true; hint.textContent = "Uploading...";
+    try {
+      const url = await uploadImage(inp.files[0], box.dataset.folder);
+      box.querySelector("input[type=hidden]").value = url; box.querySelector(".img-preview").setAttribute("style", A.cssImg(url));
+      box.querySelector("[data-remove-img]").hidden = false; hint.textContent = "Photo ready. Click Save to keep it.";
+    } catch (err) { toast(friendly(err), "error"); hint.textContent = "Upload failed. Please try again."; }
+    inp.value = ""; submit.disabled = false;
+  });
+  $("#modal-body").addEventListener("click", (e) => {
+    const r = e.target.closest("[data-remove-img]"); if (!r) return;
+    const box = r.closest(".imgfield"); box.querySelector("input[type=hidden]").value = ""; box.querySelector(".img-preview").removeAttribute("style"); r.hidden = true;
+  });
+
+  let modalHandler = null, lastFocus = null;
+  function openModal({ title, submit, body, onSubmit }) {
+    lastFocus = document.activeElement; modalHandler = onSubmit;
+    $("#modal-title").textContent = title; $("#modal-submit").textContent = submit; $("#modal-body").innerHTML = '<div class="fields">' + body + "</div>";
+    $("#modal").classList.add("open"); const first = $("#modal-body input, #modal-body select, #modal-body textarea"); if (first) first.focus();
+  }
+  function closeModal() { $("#modal").classList.remove("open"); modalHandler = null; if (lastFocus && lastFocus.focus) lastFocus.focus(); }
+  $("#modal-form").addEventListener("submit", async (e) => {
+    e.preventDefault(); if (!modalHandler) return;
+    const btn = $("#modal-submit"); btn.disabled = true;
+    try { const ok = await modalHandler(new FormData(e.target)); if (ok) closeModal(); } catch (err) { toast(friendly(err), "error"); }
+    btn.disabled = false;
+  });
+  $("#modal").addEventListener("click", (e) => { if (e.target.id === "modal" || e.target.closest('[data-modal="close"]')) closeModal(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && $("#modal").classList.contains("open")) closeModal(); });
+
+  /* ---------- Events ---------- */
+  const byId = (list, id) => list.find((x) => x.id === id);
+  const ACTIONS = {
+    "svc-add": () => openService(), "svc-edit": (id) => openService(byId(S.services, id)),
+    "svc-toggle": (id) => { const s = byId(S.services, id); return mutate(db.from("services").update({ active: !s.active }).eq("id", id)); },
+    "svc-del": (id) => confirm("Delete this service? Past appointments keep their name.") && mutate(db.from("services").delete().eq("id", id), "Service deleted"),
+    "appt-add": () => openAppointment(),
+    "appt-barber": (id) => { S.ui.apptBarber = id; S.ui.apptPage = 1; renderAppointments(); },
+    "appt-page": (_, el) => { S.ui.apptPage += Number(el.dataset.d); renderAppointments(); },
+    "appt-confirmed": (id) => mutate(db.from("appointments").update({ status: "confirmed" }).eq("id", id), "Appointment confirmed"),
+    "appt-completed": (id) => mutate(db.from("appointments").update({ status: "completed" }).eq("id", id), "Marked as done"),
+    "appt-cancelled": (id) => confirm("Cancel this appointment?") && mutate(db.from("appointments").update({ status: "cancelled" }).eq("id", id), "Appointment cancelled"),
+    "appt-del": (id) => confirm("Delete this appointment permanently?") && mutate(db.from("appointments").delete().eq("id", id), "Appointment deleted"),
+    "prod-add": () => openProduct(), "prod-edit": (id) => openProduct(byId(S.products, id)),
+    "prod-del": (id) => confirm("Delete this product?") && mutate(db.from("products").delete().eq("id", id), "Product deleted"),
+    "prod-view": (_, el) => { S.ui.prodMode = el.dataset.mode; document.querySelectorAll("[data-act=prod-view]").forEach((b) => b.classList.toggle("on", b === el)); renderProducts(); },
+    "barber-add": () => openBarber(), "barber-edit": (id) => openBarber(byId(S.barbers, id)), "barber-sched": (id) => openSchedule(byId(S.barbers, id)),
+    "barber-toggle": (id) => { const b = byId(S.barbers, id); return mutate(db.from("barbers").update({ active: !b.active }).eq("id", id)); },
+    "barber-del": (id) => confirm("Delete this barber? Their past appointments keep the name.") && mutate(db.from("barbers").delete().eq("id", id), "Barber deleted"),
+    "coupon-add": () => openCoupon(), "coupon-edit": (id) => openCoupon(byId(S.coupons, id)),
+    "coupon-toggle": (id) => { const c = byId(S.coupons, id); return mutate(db.from("coupons").update({ active: !c.active }).eq("id", id)); },
+    "coupon-del": (id) => confirm("Delete this coupon?") && mutate(db.from("coupons").delete().eq("id", id), "Coupon deleted"),
+    month: (_, el) => { S.ui.month = monthShift(S.ui.month, Number(el.dataset.d)); renderSettings(); }
+  };
+  app.addEventListener("click", async (e) => {
+    const el = e.target.closest("[data-act]"); if (!el || !ACTIONS[el.dataset.act]) return;
+    el.disabled === false && (el.disabled = false);
+    try { await ACTIONS[el.dataset.act](el.dataset.id, el); } catch (err) { toast(friendly(err), "error"); }
+  });
+  app.addEventListener("input", (e) => {
+    const k = e.target.dataset.search; if (!k) return;
+    S.ui[k + "Q"] = e.target.value; S.ui.apptPage = 1;
+    ({ svc: renderServices, appt: renderAppointments, prod: renderProducts })[k]();
+  });
+  app.addEventListener("change", (e) => {
+    const t = e.target;
+    if (t.dataset.off) { const list = S.ui.daysOff; if (t.checked) list.push(t.dataset.off); else S.ui.daysOff = list.filter((d) => d !== t.dataset.off); }
+    if (t.dataset.order) mutate(db.from("orders").update({ status: t.value }).eq("id", t.dataset.order), "Order updated");
+  });
+  app.addEventListener("submit", (e) => { if (e.target.id === "settings-form") { e.preventDefault(); saveSettings(e.target); } });
+
+  /* ---------- Render + auth ---------- */
+  function renderAll() {
+    $("#today-label").textContent = A.fmtDate(todayISO(), { weekday: "long", month: "long", day: "numeric", year: "numeric" });
+    renderOverview(); renderServices(); renderAppointments(); renderProducts(); renderTeam(); renderCoupons(); renderSettings();
+  }
+  async function start(session) {
+    if (started) return; started = true;
+    const { data: isAdmin, error } = await db.rpc("is_admin");
+    if (error || !isAdmin) { started = false; await db.auth.signOut(); showLogin("This account is not an admin. Ask the owner to add you."); return; }
+    try { await load(); } catch (err) { started = false; showLogin(friendly(err)); return; }
+    const email = session.user.email || "Admin";
+    $("#user-name").textContent = email.split("@")[0]; $("#user-initials").textContent = initials(email.split("@")[0]);
+    loginBox.hidden = true; app.hidden = false; renderAll();
+  }
+  function showLogin(msg) { app.hidden = true; loginBox.hidden = false; if (msg) $("#login-msg").textContent = msg; }
+  $("#login-form").addEventListener("submit", async (e) => {
+    e.preventDefault(); const btn = e.target.querySelector("button"); btn.disabled = true;
+    const { error } = await db.auth.signInWithPassword({ email: $("#l-email").value.trim(), password: $("#l-pass").value });
+    btn.disabled = false; if (error) { $("#login-msg").textContent = friendly(error); toast(friendly(error), "error"); }
+  });
+  $("#logout").addEventListener("click", async () => { await db.auth.signOut(); });
+  db.auth.onAuthStateChange((event, session) => {
+    if (event === "SIGNED_OUT") { started = false; S.ui.month = null; showLogin("Signed out. Sign in to continue."); }
+    else if (session && !started) setTimeout(() => start(session), 0);   // outside the callback to avoid auth deadlocks
+  });
+  db.auth.getSession().then(({ data }) => { if (!data.session) showLogin(); });
+})();
+
+  </script>
+</body>
+</html>
