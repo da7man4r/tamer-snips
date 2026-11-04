@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="images/logo.png">
+  <title>Tamer Hairstylist | Sharp Cuts. Clean Looks.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+/* ---------- Tokens ---------- */
+:root {
+  --bg: #1a1a1a;
+  --bg-deep: #141414;
+  --card: #252525;
+  --card-border: #343434;
+  --gold: #c8a951;
+  --gold-soft: rgba(200, 169, 81, 0.15);
+  --text: #f5f0e6;
+  --muted: #9a958a;
+  --green: #4fbf7f;
+  --radius: 10px;
+  --serif: "Playfair Display", Georgia, serif;
+  --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  line-height: 1.5;
+}
+
+img { max-width: 100%; display: block; }
+a { color: inherit; text-decoration: none; }
+h1, h2, h3 { font-family: var(--serif); margin: 0; }
+
+:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+.container { width: min(1180px, 92%); margin-inline: auto; }
+
+/* ---------- Buttons ---------- */
+.btn {
+  display: inline-block;
+  padding: 14px 28px;
+  border-radius: 6px;
+  border: 2px solid var(--gold);
+  background: var(--gold);
+  color: #1a1a1a;
+  font: 500 1rem var(--sans);
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.btn:hover { background: #d9bb64; }
+.btn-outline { background: transparent; color: var(--gold); }
+.btn-outline:hover { background: var(--gold-soft); }
+.btn-block { width: 100%; text-align: center; }
+
+/* ---------- Header ---------- */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(26, 26, 26, 0.96);
+  border-bottom: 1px solid #262626;
+}
+.nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 12px 0;
+}
+.logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  background: #fff center / cover;
+  display: grid;
+  place-items: center;
+  color: #1a1a1a;
+  font: 700 0.6rem var(--serif);
+  text-align: center;
+  line-height: 1;
+}
+.nav-links { display: flex; gap: 32px; list-style: none; margin: 0; padding: 0; }
+.nav-links a { padding: 6px 0; transition: color 0.2s; }
+.nav-links a:hover,
+.nav-links a[aria-current="page"] { color: var(--gold); }
+.nav-actions { display: flex; align-items: center; gap: 20px; }
+.cart { position: relative; display: grid; place-items: center; width: 28px; height: 28px; }
+.cart svg { width: 22px; height: 22px; }
+.cart-count {
+  position: absolute;
+  top: -6px;
+  right: -8px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  background: #b3261e;
+  font-size: 0.65rem;
+  display: grid;
+  place-items: center;
+}
+.nav-actions .btn { padding: 12px 24px; border-radius: 8px; }
+
+/* ---------- Hero ---------- */
+.hero {
+  position: relative;
+  min-height: 82vh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 80px 0;
+  /* Swap in your own photo: url("images/hero.jpg") */
+  background:
+    linear-gradient(90deg, rgba(26,26,26,0.95) 0%, rgba(26,26,26,0.55) 55%, rgba(26,26,26,0.85) 100%),
+    url("images/hero.jpg") center / cover no-repeat,
+    #1f1b16;
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+.hero h1 {
+  color: var(--gold);
+  font-size: clamp(2.8rem, 8vw, 5.6rem);
+  line-height: 1.05;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+.hero p { font-size: clamp(1.1rem, 2.4vw, 1.6rem); margin: 28px 0 40px; }
+.hero-actions { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+
+/* ---------- Sections ---------- */
+.section { padding: 100px 0; }
+.section-alt { background: var(--bg-deep); }
+.section-title {
+  text-align: center;
+  font-size: clamp(2rem, 4.5vw, 3rem);
+  text-transform: uppercase;
+  padding-bottom: 16px;
+  margin-bottom: 56px;
+  position: relative;
+}
+.section-title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 106px;
+  height: 2px;
+  background: var(--gold);
+  transform: translateX(-50%);
+}
+
+/* ---------- Services ---------- */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}
+.service-card {
+  background: var(--card);
+  border: 1px solid var(--card-border);
+  border-top: 2px solid var(--gold);
+  border-radius: var(--radius);
+  padding: 32px 28px;
+}
+.service-card svg { width: 36px; height: 36px; stroke: var(--gold); fill: none; stroke-width: 1.6; margin-bottom: 20px; }
+.service-card h3 { font-size: 1.5rem; margin-bottom: 6px; }
+.service-card .price { color: var(--gold); margin: 0 0 14px; }
+.service-card p { color: var(--muted); margin: 0; }
+
+/* ---------- Team ---------- */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 32px;
+}
+.team-card { background: var(--card); border-radius: var(--radius); overflow: hidden; }
+.team-photo { aspect-ratio: 1 / 1; background: #333 center / cover; }
+.team-body { padding: 24px 20px 20px; }
+.team-body h3 { font-size: 1.6rem; }
+.team-body .role { color: var(--gold); margin: 8px 0 12px; }
+.team-body .exp { color: var(--muted); margin: 0 0 14px; font-size: 0.95rem; }
+.rating { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+.rating svg { width: 16px; height: 16px; fill: var(--gold); }
+
+/* ---------- Shop ---------- */
+.tabs { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; margin-bottom: 40px; }
+.tab {
+  padding: 10px 22px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: var(--card);
+  color: var(--text);
+  font: 500 0.95rem var(--sans);
+  cursor: pointer;
+}
+.tab.active { background: var(--gold); border-color: var(--gold); color: #1a1a1a; }
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 24px;
+}
+.product-card { background: var(--card); border-radius: var(--radius); overflow: hidden; }
+.product-img { aspect-ratio: 4 / 3; background: #333 center / cover; }
+.product-body { padding: 20px; }
+.product-body h3 { font-size: 1.2rem; margin-bottom: 4px; }
+.product-body .price { color: var(--gold); margin: 0 0 16px; }
+
+/* ---------- Footer ---------- */
+.site-footer { border-top: 1px solid #262626; padding: 56px 0 32px; background: var(--bg); }
+.footer-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr;
+  gap: 32px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid #2c2c2c;
+}
+.footer-brand { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.footer-brand strong { font: 700 1.6rem/1.15 var(--serif); color: var(--gold); }
+.site-footer h4 { font: 700 1.2rem var(--serif); margin: 0 0 16px; }
+.site-footer ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.site-footer li, .site-footer p, .site-footer a { color: var(--muted); font-size: 0.95rem; margin: 0; }
+.site-footer a:hover { color: var(--gold); }
+.copyright { text-align: center; padding-top: 28px; color: var(--muted); font-size: 0.95rem; }
+
+/* ---------- Booking page ---------- */
+.page-head { padding: 80px 0 40px; }
+.steps {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  max-width: 780px;
+  margin: 0 auto 48px;
+  list-style: none;
+  padding: 0;
+}
+.step { display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--muted); }
+.step-dot {
+  width: 34px; height: 34px; border-radius: 50%;
+  display: grid; place-items: center;
+  background: var(--card); border: 1px solid var(--card-border);
+  color: var(--muted); font-weight: 700; font-size: 0.85rem;
+}
+.step.done .step-dot { background: var(--green); border-color: var(--green); color: #fff; }
+.step.current .step-dot { background: var(--gold); border-color: var(--gold); color: #1a1a1a; }
+.step.current { color: var(--text); }
+.step-line { flex: 1; height: 2px; background: var(--card-border); margin: 17px 8px 0; }
+.step-line.done { background: var(--green); }
+
+.panel {
+  width: min(760px, 92%);
+  margin: 0 auto 32px;
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 32px;
+}
+.panel h2 { font-size: 2rem; margin-bottom: 24px; }
+.panel h3 { color: var(--muted); font-size: 1.3rem; margin: 28px 0 14px; }
+
+.option-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.option {
+  display: block;
+  padding: 16px 18px;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  background: #1f1f1f;
+  cursor: pointer;
+}
+.option strong { display: block; font: 700 1.05rem var(--serif); margin-bottom: 4px; }
+.option span { color: var(--gold); font-size: 0.9rem; }
+.option small { color: var(--muted); margin-left: 8px; }
+.option input { position: absolute; opacity: 0; pointer-events: none; }
+.option:has(input:checked) { border-color: var(--gold); background: var(--gold-soft); }
+.option:has(input:focus-visible) { outline: 2px solid var(--gold); outline-offset: 2px; }
+.option:has(input:disabled) { opacity: 0.45; cursor: not-allowed; }
+
+.field { display: grid; gap: 6px; margin-bottom: 18px; }
+.field label { color: var(--muted); font-size: 0.9rem; }
+.field input,
+.field textarea {
+  width: 100%;
+  padding: 14px 16px;
+  background: #1a1a1a;
+  border: 1px solid var(--card-border);
+  border-radius: 8px;
+  color: var(--text);
+  font: 1rem var(--sans);
+}
+.field input:focus,
+.field textarea:focus { border-color: var(--gold); outline: none; }
+.field textarea { min-height: 120px; resize: vertical; }
+
+.summary { background: #1f1f1f; border-radius: 8px; padding: 6px 20px; margin: 0; }
+.summary div { display: flex; justify-content: space-between; gap: 16px; padding: 14px 0; border-bottom: 1px solid #2c2c2c; }
+.summary div:last-child { border-bottom: 0; }
+.summary dt { color: var(--muted); }
+.summary dd { margin: 0; }
+
+.form-nav { width: min(760px, 92%); margin: 0 auto 100px; display: flex; justify-content: space-between; }
+
+/* ---------- Responsive ---------- */
+@media (max-width: 860px) {
+  .nav-links { display: none; }
+  .footer-grid { grid-template-columns: 1fr 1fr; }
+}
+@media (max-width: 520px) {
+  .footer-grid { grid-template-columns: 1fr; }
+  .nav-actions .btn { padding: 10px 16px; }
+  .section { padding: 72px 0; }
+  .panel { padding: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; }
+}
+
+/* ---------- Added for the live (database) version ---------- */
+[hidden] { display: none !important; }
+.muted { color: var(--muted); }
+.center { text-align: center; grid-column: 1 / -1; }
+.btn:disabled { opacity: .45; cursor: not-allowed; }
+.team-initials { display: grid; place-items: center; height: 100%; font: 700 3rem var(--serif); color: var(--gold); }
+.product-body .price s { color: var(--muted); margin-right: 6px; }
+.product-body .price small { color: var(--muted); }
+
+.toast { position: fixed; left: 50%; bottom: 24px; transform: translate(-50%, 20px); opacity: 0; pointer-events: none; z-index: 200;
+  background: #2b2b2b; border: 1px solid var(--gold); color: var(--text); padding: 12px 20px; border-radius: 8px; max-width: min(92vw, 460px); transition: opacity .2s, transform .2s; }
+.toast.show { opacity: 1; transform: translate(-50%, 0); }
+.toast.error { border-color: #c0392b; }
+.setup-banner { background: #3a2a12; color: #f3d9a4; text-align: center; padding: 10px 16px; font-size: .9rem; }
+.setup-banner code { background: rgba(0,0,0,.35); padding: 1px 6px; border-radius: 4px; }
+
+.cart-dialog { border: 1px solid var(--card-border); border-radius: 12px; background: var(--card); color: var(--text); padding: 0; width: min(480px, 92vw); }
+.cart-dialog::backdrop { background: rgba(0,0,0,.7); }
+.cart-box { padding: 26px; display: grid; gap: 14px; }
+.cart-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.cart-list li { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 12px; background: #1c1c1c; border-radius: 8px; }
+.cart-list small { display: block; color: var(--muted); }
+.qty { display: inline-flex; align-items: center; gap: 10px; }
+.qty button { width: 28px; height: 28px; border-radius: 6px; border: 1px solid var(--card-border); background: #2c2c2c; color: var(--text); cursor: pointer; }
+.cart-total { display: flex; justify-content: space-between; font-size: 1.1rem; margin: 0; }
+.cart-actions { display: flex; gap: 12px; flex-wrap: wrap; }
+
+.nofield { border: 0; min-width: 0; }
+.panel legend.h2 { font: 700 2rem var(--serif); padding: 0; margin-bottom: 24px; float: left; width: 100%; }
+.panel legend.h2 + * { clear: both; }
+.week-nav { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 14px; }
+.week-nav .btn { padding: 8px 16px; }
+.date-grid { grid-template-columns: repeat(auto-fit, minmax(72px, 1fr)); text-align: center; }
+.time-grid { grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); text-align: center; }
+.date-grid .option { padding: 12px 6px; }
+.done-panel { text-align: center; padding: 48px 32px; }
+.done-panel h2 { color: var(--gold); }
+.done-panel p { margin-top: 10px; }
+.form-nav .btn:disabled { opacity: .4; cursor: not-allowed; }
+
+.field .hint { color: var(--muted); font-size: .78rem; }
+
+/* service photos */
+.service-card.has-img { padding-top: 0; overflow: hidden; }
+.service-img { margin: 0 -28px 20px; aspect-ratio: 16 / 10; background: #333 center / cover no-repeat; }
+.opt-img { display: block; height: 96px; margin: -16px -18px 12px; border-radius: 8px 8px 0 0; background: #333 center / cover no-repeat; }
+.option { overflow: hidden; }
+
+/* your own logo (images/logo.png) */
+.logo.has-logo { color: transparent; font-size: 0; border: 0; border-radius: 0; background-color: transparent; background-size: contain; background-repeat: no-repeat; background-position: center; }
+.site-header .logo.has-logo { width: 68px; height: 68px; }
+.footer-brand .logo.has-logo { width: 84px; height: 84px; }
+
+  </style>
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="container nav">
+      <a href="index.html" class="logo" aria-label="Tamer Hairstylist home">
+        <!-- Replace with: <img src="images/logo.png" alt="Tamer Hairstylist"> -->
+        TAMER
+      </a>
+      <nav aria-label="Main">
+        <ul class="nav-links">
+          <li><a href="index.html" aria-current="page">Home</a></li>
+          <li><a href="#services">Services</a></li>
+          <li><a href="#shop">Shop</a></li>
+          <li><a href="#team">Our Team</a></li>
+        </ul>
+      </nav>
+      <div class="nav-actions">
+        <a href="#" class="cart" id="cart-btn" aria-label="Open cart">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7h12l-1 13H7L6 7z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg>
+          <span class="cart-count">0</span>
+        </a>
+        <a href="#booking" class="btn">Book Now</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container">
+        <h1>Sharp cuts.<br>Clean looks.</h1>
+        <p>Walk in looking good. Walk out legendary.</p>
+        <div class="hero-actions">
+          <a href="#booking" class="btn">Book an Appointment</a>
+          <a href="#shop" class="btn btn-outline">Shop Products</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Services -->
+    <section class="section" id="services">
+      <div class="container">
+        <h2 class="section-title">What we do</h2>
+        <div class="services-grid" id="services-grid" aria-live="polite"><p class="muted center">Loading services...</p></div>
+      </div>
+    </section>
+
+    <!-- Team -->
+    <section class="section section-alt" id="team">
+      <div class="container">
+        <h2 class="section-title">Meet the team</h2>
+        <div class="team-grid" id="team-grid" aria-live="polite"><p class="muted center">Loading team...</p></div>
+      </div>
+    </section>
+
+    <!-- Shop -->
+    <section class="section" id="shop">
+      <div class="container">
+        <h2 class="section-title">The shop</h2>
+        <div class="tabs" id="shop-tabs" role="group" aria-label="Product categories"></div>
+        <div class="product-grid" id="product-grid" aria-live="polite"><p class="muted center">Loading products...</p></div>
+      </div>
+    </section>
+
+    <!-- Booking (same page) -->
+    <section class="section section-alt" id="booking">
+      <div class="container">
+        <h2 class="section-title">Book appointment</h2>
+        <ol class="steps" id="steps" aria-label="Booking progress"></ol>
+      </div>
+      <div id="panel" aria-live="polite"><noscript><p class="panel">Please turn on JavaScript to book online.</p></noscript></div>
+      <div class="form-nav" id="nav"></div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-brand">
+            <span class="logo" aria-hidden="true">TAMER</span>
+            <strong>Tamer<br>Hairstylist</strong>
+          </div>
+          <p>Sharp cuts. Clean looks. Walk in looking good. Walk out legendary.</p>
+        </div>
+        <div>
+          <h4>Quick Links</h4>
+          <ul>
+            <li><a href="#services">Services</a></li>
+            <li><a href="#shop">Shop</a></li>
+            <li><a href="#team">Our Team</a></li>
+            <li><a href="#booking">Book Appointment</a></li>
+          </ul>
+        </div>
+        <div>
+          <h4>Opening Hours</h4>
+          <ul>
+            <li>Mon - Fri: 9AM - 8PM</li>
+            <li>Saturday: 10AM - 6PM</li>
+            <li>Sunday: 11AM - 5PM</li>
+          </ul>
+        </div>
+        <div>
+          <h4>Contact</h4>
+          <ul>
+            <li>123 Barber Street</li>
+            <li>New York, NY 10001</li>
+            <li><a href="tel:+15551234567">(555) 123-4567</a></li>
+            <li><a href="mailto:info@tamersnips.com">info@tamersnips.com</a></li>
+          </ul>
+        </div>
+      </div>
+      <p class="copyright">&copy; 2026 Tamer Hairstylist. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+// Paste your two values from Supabase > Project Settings > API Keys
+// (or the "Connect" button at the top of your project).
+// The publishable key (starts with sb_publishable_) is SAFE to put here:
+// the database security rules decide what visitors can do.
+// NEVER paste a "secret" or "service_role" key into this file.
+window.SITE_CONFIG = {
+  SUPABASE_URL: "PASTE_YOUR_PROJECT_URL_HERE",
+  SUPABASE_KEY: "PASTE_YOUR_PUBLISHABLE_KEY_HERE"
+};
+
+/* Shared helpers used by the public site and the dashboard. */
+(function () {
+  const C = window.SITE_CONFIG || {};
+  const configured = /^https:\/\//.test(C.SUPABASE_URL || "") && !/PASTE/.test(C.SUPABASE_KEY || "PASTE");
+  const db = configured && window.supabase ? window.supabase.createClient(C.SUPABASE_URL, C.SUPABASE_KEY) : null;
+
+  const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const CURRENCY = "DZD";   // change this one word to use another currency label
+  const money = (n) => Number(n || 0).toLocaleString("en-US", { maximumFractionDigits: 2 }) + " " + CURRENCY;
+  const initials = (name) => String(name || "?").split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+  // Safe CSS for a background photo (the address is cleaned so it cannot break out of the style)
+  const cssImg = (u) => "background-image:url('" + String(u || "").replace(/[\s'"()<>\\]/g, (ch) => "%" + ch.charCodeAt(0).toString(16).toUpperCase().padStart(2, "0")) + "')";
+  const DAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"];
+  const DAY_NAMES = { mon: "Mon", tue: "Tue", wed: "Wed", thu: "Thu", fri: "Fri", sat: "Sat", sun: "Sun" };
+
+  function fmtTime(t) {                       // "17:00" or "17:00:00" -> "5:00 PM"
+    const [h, m] = String(t).split(":").map(Number);
+    return ((h + 11) % 12 + 1) + ":" + String(m).padStart(2, "0") + " " + (h < 12 ? "AM" : "PM");
+  }
+  const toMin = (t) => { const [h, m] = String(t).split(":").map(Number); return h * 60 + m; };
+  const fromMin = (n) => String(Math.floor(n / 60)).padStart(2, "0") + ":" + String(n % 60).padStart(2, "0");
+  function fmtDate(iso, opts) {
+    const [y, m, d] = iso.split("-").map(Number);
+    return new Date(y, m - 1, d).toLocaleDateString("en-US", opts || { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+  }
+  const isoOf = (dt) => dt.getFullYear() + "-" + String(dt.getMonth() + 1).padStart(2, "0") + "-" + String(dt.getDate()).padStart(2, "0");
+  function addDays(iso, n) { const [y, m, d] = iso.split("-").map(Number); return isoOf(new Date(y, m - 1, d + n)); }
+  function weekdayKey(iso) { const [y, m, d] = iso.split("-").map(Number); return DAYS[(new Date(y, m - 1, d).getDay() + 6) % 7]; }
+
+  // "Now" in the shop's own time zone, so bookings do not depend on the visitor's clock.
+  function shopNow(tz) {
+    const parts = new Intl.DateTimeFormat("en-CA", { timeZone: tz || "America/New_York", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false }).formatToParts(new Date());
+    const g = (t) => parts.find((p) => p.type === t).value;
+    return { date: g("year") + "-" + g("month") + "-" + g("day"), minutes: (Number(g("hour")) % 24) * 60 + Number(g("minute")) };
+  }
+  const absMinutes = (iso, mins) => { const [y, m, d] = iso.split("-").map(Number); return Date.UTC(y, m - 1, d) / 60000 + mins; };
+
+  const ERRORS = {
+    slot_taken: "Sorry, that time was just taken. Please pick another time.",
+    too_soon: "That time is too soon. Please choose a later slot.",
+    day_off: "The shop is closed on that day. Please choose another date.",
+    barber_off: "That barber does not work on that day.",
+    outside_hours: "That time is outside the barber's working hours.",
+    date_out_of_range: "That date cannot be booked yet. Please choose another.",
+    bad_phone: "Please enter a 10-digit phone number, like 0555123456.",
+    missing_details: "Please fill in your name and phone number.",
+    service_unavailable: "That service is no longer available.",
+    barber_unavailable: "That barber is no longer available.",
+    out_of_stock: "Sorry, one of the products is out of stock.",
+    product_unavailable: "One of the products is no longer available.",
+    empty_cart: "Your cart is empty.",
+    bad_quantity: "Please choose a quantity between 1 and 20."
+  };
+  function friendly(err) {
+    const msg = (err && (err.message || err.details)) || String(err || "");
+    for (const k in ERRORS) if (msg.includes(k)) return ERRORS[k];
+    if (/Bucket not found/i.test(msg)) return "Photo storage is not set up yet. Run the latest supabase-all-in-one.sql in Supabase.";
+    if (/row-level security|not authorized|Unauthorized/i.test(msg)) return "Not allowed. Make sure you are signed in as an admin and the latest SQL was run.";
+    if (/image_url.*(schema cache|does not exist)|column.*image_url/i.test(msg)) return "The database needs the latest update. Run supabase-all-in-one.sql in Supabase, then try again.";
+    if (/mime type|not supported|too large|exceeded the maximum/i.test(msg)) return "That photo was refused. Use a JPG, PNG or WebP under 5 MB.";
+    if (/Invalid login/i.test(msg)) return "Wrong email or password.";
+    if (/Failed to fetch|NetworkError/i.test(msg)) return "Cannot reach the server. Check your internet connection.";
+    return msg || "Something went wrong. Please try again.";
+  }
+
+  let toastTimer;
+  function toast(message, kind) {
+    let el = document.getElementById("toast");
+    if (!el) { el = document.createElement("div"); el.id = "toast"; el.className = "toast"; el.setAttribute("role", "status"); document.body.appendChild(el); }
+    el.textContent = message;
+    el.className = "toast show" + (kind === "error" ? " error" : "");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => { el.className = "toast"; }, 4200);
+  }
+
+  function setupBanner() {
+    const el = document.createElement("div");
+    el.className = "setup-banner";
+    el.innerHTML = "<strong>Database not connected yet.</strong> Open <code>config.js</code> and paste your Supabase Project URL and publishable key.";
+    document.body.prepend(el);
+  }
+
+  async function getSettings() {
+    const { data, error } = await db.from("settings").select("*").eq("id", 1).single();
+    if (error) throw error;
+    return data;
+  }
+
+  /* ---------- Cart (kept in this browser; orders are saved with place_order) ---------- */
+  const CART_KEY = "tamer_cart_v1";
+  const cart = {
+    load() { try { return JSON.parse(localStorage.getItem(CART_KEY)) || []; } catch (e) { return []; } },
+    save(items) { try { localStorage.setItem(CART_KEY, JSON.stringify(items)); } catch (e) { /* storage blocked */ } cart.badge(); },
+    count() { return cart.load().reduce((n, i) => n + i.qty, 0); },
+    total() { return cart.load().reduce((n, i) => n + i.qty * i.price, 0); },
+    add(p) {
+      const items = cart.load(); const found = items.find((i) => i.id === p.id);
+      if (found) found.qty = Math.min(20, found.qty + 1); else items.push({ id: p.id, name: p.name, price: p.price, qty: 1 });
+      cart.save(items); toast(p.name + " added to cart");
+    },
+    badge() { document.querySelectorAll(".cart-count").forEach((el) => { el.textContent = cart.count(); }); },
+    open() {
+      let dlg = document.getElementById("cart-dialog");
+      if (!dlg) {
+        dlg = document.createElement("dialog"); dlg.id = "cart-dialog"; dlg.className = "cart-dialog";
+        dlg.addEventListener("click", (e) => { if (e.target === dlg) dlg.close(); });
+        dlg.addEventListener("click", cart.onClick);
+        dlg.addEventListener("submit", cart.onSubmit);
+        document.body.appendChild(dlg);
+      }
+      cart.render(dlg); dlg.showModal();
+    },
+    render(dlg) {
+      const items = cart.load();
+      if (!items.length) { dlg.innerHTML = '<div class="cart-box"><h2>Your cart</h2><p class="muted">Your cart is empty.</p><button class="btn btn-outline" data-cart="close" type="button">Close</button></div>'; return; }
+      dlg.innerHTML = '<form class="cart-box" method="dialog" id="cart-form"><h2>Your cart</h2><ul class="cart-list">' +
+        items.map((i) => '<li><span>' + esc(i.name) + '<small>' + money(i.price) + ' each</small></span><span class="qty"><button type="button" data-cart="minus" data-id="' + esc(i.id) + '" aria-label="Fewer">&minus;</button>' + i.qty + '<button type="button" data-cart="plus" data-id="' + esc(i.id) + '" aria-label="More">+</button></span></li>').join("") +
+        '</ul><p class="cart-total">Total <strong>' + money(cart.total()) + '</strong></p>' +
+        '<p class="muted">Reserve these for pickup and pay at the shop. The total is confirmed when you reserve.</p>' +
+        '<div class="field"><label for="c-name">Your name *</label><input id="c-name" required></div>' +
+        '<div class="field"><label for="c-phone">Phone number *</label><input id="c-phone" type="tel" required></div>' +
+        '<div class="cart-actions"><button class="btn" type="submit">Reserve for pickup</button><button class="btn btn-outline" type="button" data-cart="close">Close</button></div></form>';
+    },
+    onClick(e) {
+      const b = e.target.closest("[data-cart]"); if (!b) return;
+      const dlg = document.getElementById("cart-dialog"); const act = b.dataset.cart;
+      if (act === "close") return dlg.close();
+      const items = cart.load(); const it = items.find((i) => i.id === b.dataset.id); if (!it) return;
+      it.qty += act === "plus" ? 1 : -1;
+      cart.save(items.filter((i) => i.qty > 0).map((i) => ({ ...i, qty: Math.min(20, i.qty) })));
+      cart.render(dlg);
+    },
+    async onSubmit(e) {
+      e.preventDefault(); if (!db) return;
+      const dlg = document.getElementById("cart-dialog");
+      const btn = dlg.querySelector('[type="submit"]'); btn.disabled = true;
+      const { error } = await db.rpc("place_order", {
+        p_name: dlg.querySelector("#c-name").value, p_phone: dlg.querySelector("#c-phone").value,
+        p_items: cart.load().map((i) => ({ id: i.id, qty: i.qty }))
+      });
+      btn.disabled = false;
+      if (error) return toast(friendly(error), "error");
+      cart.save([]); dlg.close(); toast("Reserved! We will have it ready for pickup.");
+      if (window.onOrderPlaced) window.onOrderPlaced();
+    }
+  };
+
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("#cart-btn"); if (b) { e.preventDefault(); cart.open(); }
+  });
+  // Your own logo: save it as images/logo.png (next to index.html). It replaces the "TAMER" badge everywhere.
+  const LOGO = "images/logo.png";
+  function applyLogo() {
+    const img = new Image();
+    img.onload = () => document.querySelectorAll(".logo").forEach((el) => { el.classList.add("has-logo"); el.style.backgroundImage = "url('" + LOGO + "')"; });
+    img.src = LOGO;   // if the file does not exist nothing changes and the text badge stays
+  }
+  document.addEventListener("DOMContentLoaded", () => { cart.badge(); applyLogo(); if (!db) setupBanner(); });
+
+  window.App = { db, cssImg, esc, money, initials, DAYS, DAY_NAMES, fmtTime, toMin, fromMin, fmtDate, isoOf, addDays, weekdayKey, shopNow, absMinutes, friendly, toast, getSettings, cart };
+})();
+
+/* Home page: loads services, barbers and products from the database. */
+(function () {
+  const { db, esc, money, initials, cart, friendly, toast } = App;
+  if (!db) return;
+
+  const ICONS = {
+    Hair: '<circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12"/>',
+    Beard: '<path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3z"/>',
+    Shave: '<path d="M12 3s6 6.3 6 11a6 6 0 0 1-12 0c0-4.7 6-11 6-11z"/>',
+    Color: '<path d="M12 3a9 9 0 1 0 0 18c1.7 0 2.5-1.2 2-2.6-.5-1.3.4-2.4 1.8-2.4H18a3 3 0 0 0 3-3C21 7 17 3 12 3z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/>'
+  };
+  const STAR = '<svg viewBox="0 0 24 24"><path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 20.9l1.6-7L2 9.2l7.1-.6L12 2z"/></svg>';
+  let products = [];
+  let activeCat = "All";
+
+  function showError(el, err) { el.innerHTML = '<p class="muted center">' + esc(friendly(err)) + "</p>"; }
+
+  async function loadServices() {
+    const el = document.getElementById("services-grid");
+    const { data, error } = await db.from("services").select("*").order("price");
+    if (error) return showError(el, error);
+    if (!data.length) { el.innerHTML = '<p class="muted center">No services yet. Check back soon.</p>'; return; }
+    el.innerHTML = data.map((s) =>
+      '<article class="service-card' + (s.image_url ? " has-img" : "") + '">' + (s.image_url ? '<div class="service-img" style="' + App.cssImg(s.image_url) + '" role="img" aria-label="' + esc(s.name) + '"></div>' : '<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">' + (ICONS[s.category] || ICONS.Hair) + "</svg>") +
+      "<h3>" + esc(s.name) + '</h3><p class="price">' + money(s.price) + " &middot; " + s.duration + " min</p><p>" + esc(s.description) + "</p></article>").join("");
+  }
+
+  async function loadTeam() {
+    const el = document.getElementById("team-grid");
+    const { data, error } = await db.from("barbers").select("*").order("created_at");
+    if (error) return showError(el, error);
+    if (!data.length) { el.innerHTML = '<p class="muted center">Our team will appear here soon.</p>'; return; }
+    el.innerHTML = data.map((b) =>
+      '<article class="team-card"><div class="team-photo" role="img" aria-label="' + esc(b.name) + '"' + (b.photo_url ? ' style="background-image:url(\'' + esc(b.photo_url) + '\')"' : "") + ">" +
+      (b.photo_url ? "" : '<span class="team-initials">' + esc(initials(b.name)) + "</span>") + "</div>" +
+      '<div class="team-body"><h3>' + esc(b.name) + '</h3><p class="role">' + esc(b.title) + '</p><p class="exp">' + b.years_exp + " year" + (b.years_exp === 1 ? "" : "s") + ' experience</p>' +
+      '<div class="rating">' + STAR + Number(b.rating) + '</div><a href="#booking" data-barber="' + esc(b.id) + '" class="btn btn-block">Book with Me</a></div></article>').join("");
+  }
+
+  function renderShop() {
+    const tabs = document.getElementById("shop-tabs");
+    const grid = document.getElementById("product-grid");
+    const cats = ["All", ...new Set(products.map((p) => p.category))];
+    tabs.innerHTML = cats.map((c) => '<button class="tab' + (c === activeCat ? " active" : "") + '" type="button" data-cat="' + esc(c) + '" aria-pressed="' + (c === activeCat) + '">' + esc(c) + "</button>").join("");
+    const list = products.filter((p) => activeCat === "All" || p.category === activeCat);
+    if (!list.length) { grid.innerHTML = '<p class="muted center">No products in this category yet.</p>'; return; }
+    grid.innerHTML = list.map((p) => {
+      const unit = Math.round(p.price * (100 - p.discount)) / 100;
+      const out = p.stock < 1;
+      return '<article class="product-card"><div class="product-img"' + (p.image_url ? ' style="background-image:url(\'' + esc(p.image_url) + '\')"' : "") + ' role="img" aria-label="' + esc(p.name) + '"></div>' +
+        '<div class="product-body"><h3>' + esc(p.name) + '</h3><p class="price">' + (p.discount ? "<s>" + money(p.price) + "</s> " : "") + money(unit) + (p.discount ? ' <small>(' + p.discount + "% off)</small>" : "") + "</p>" +
+        '<button class="btn btn-block" type="button" data-add="' + esc(p.id) + '"' + (out ? " disabled" : "") + ">" + (out ? "Out of stock" : "Add to Cart") + "</button></div></article>";
+    }).join("");
+  }
+
+  async function loadProducts() {
+    const grid = document.getElementById("product-grid");
+    const { data, error } = await db.from("products").select("*").order("created_at");
+    if (error) return showError(grid, error);
+    products = data; renderShop();
+  }
+
+  document.addEventListener("click", (e) => {
+    const bk = e.target.closest("[data-barber]");
+    if (bk) window.dispatchEvent(new CustomEvent("select-barber", { detail: bk.dataset.barber }));
+    const tab = e.target.closest("[data-cat]");
+    if (tab) { activeCat = tab.dataset.cat; renderShop(); return; }
+    const add = e.target.closest("[data-add]");
+    if (add) {
+      const p = products.find((x) => x.id === add.dataset.add); if (!p) return;
+      cart.add({ id: p.id, name: p.name, price: Math.round(p.price * (100 - p.discount)) / 100 });
+    }
+  });
+  window.onOrderPlaced = loadProducts;   // refresh stock after a reservation
+
+  loadServices(); loadTeam(); loadProducts();
+})();
+
+/* Booking wizard: service -> barber -> date & time -> details -> confirm. */
+(function () {
+  const A = App, { db, esc, money, fmtTime, fmtDate, toMin, fromMin, addDays, weekdayKey, shopNow, absMinutes, friendly, toast } = A;
+  const panel = document.getElementById("panel"), nav = document.getElementById("nav"), stepsEl = document.getElementById("steps");
+  const PHONE_RE = /^0\d{9}$/;   // 10 digits, starts with 0, like 0555123456
+  const LABELS = ["Service", "Barber", "Date & Time", "Your Details", "Confirm"];
+  if (!db) { panel.innerHTML = '<div class="panel"><p>Online booking is not connected yet.</p></div>'; return; }
+
+  const st = { step: 1, services: [], barbers: [], cfg: null, service: null, barber: null, date: null, time: null,
+               weekOffset: 0, busy: [], times: [], details: { name: "", phone: "", notes: "" }, loadingTimes: false, done: null };
+
+  const toTop = () => { const el = document.getElementById("booking"); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); };
+
+  function renderSteps() {
+    stepsEl.innerHTML = LABELS.map((l, i) => {
+      const n = i + 1, cls = st.done || n < st.step ? "done" : n === st.step ? "current" : "";
+      return (i ? '<li class="step-line' + (st.done || n <= st.step ? ' done' : '') + '" aria-hidden="true"></li>' : "") +
+        '<li class="step ' + cls + '"' + (n === st.step && !st.done ? ' aria-current="step"' : "") + '><span class="step-dot">' + (cls === "done" ? "&#10003;" : n) + "</span>" + esc(l) + "</li>";
+    }).join("");
+  }
+
+  function canNext() {
+    if (st.step === 1) return !!st.service;
+    if (st.step === 2) return !!st.barber;
+    if (st.step === 3) return !!(st.date && st.time);
+    if (st.step === 4) { const d = st.details; return d.name.trim() && PHONE_RE.test(d.phone); }
+    return true;
+  }
+  function renderNav() {
+    if (st.done) { nav.innerHTML = '<a href="#" class="btn btn-outline">Back to top</a><button class="btn" type="button" data-go="again">Book another</button>'; return; }
+    nav.innerHTML = '<button class="btn btn-outline" type="button" data-go="back"' + (st.step === 1 ? " disabled" : "") + '>Back</button>' +
+      '<button class="btn" type="button" data-go="next"' + (canNext() ? "" : " disabled") + ">" + (st.step === 5 ? "Confirm Booking" : "Next") + "</button>";
+  }
+
+  /* ----- Step views ----- */
+  function viewService() {
+    if (!st.services.length) return '<div class="panel"><h2>Choose a service</h2><p class="muted">No services are available right now.</p></div>';
+    return '<fieldset class="panel nofield"><legend class="h2">Choose a service</legend><div class="option-grid">' + st.services.map((s) =>
+      '<label class="option"><input type="radio" name="service" value="' + esc(s.id) + '"' + (st.service && st.service.id === s.id ? " checked" : "") + ">" + (s.image_url ? '<span class="opt-img" style="' + A.cssImg(s.image_url) + '"></span>' : "") + "<strong>" + esc(s.name) + "</strong><span>" + money(s.price) + "</span><small>" + s.duration + " min</small></label>").join("") + "</div></fieldset>";
+  }
+  const worksAny = (b) => A.DAYS.some((d) => b.schedule[d] && b.schedule[d].on);
+  function viewBarber() {
+    return '<fieldset class="panel nofield"><legend class="h2">Choose your barber</legend><div class="option-grid">' + st.barbers.map((b) => {
+      const off = !worksAny(b);
+      return '<label class="option"><input type="radio" name="barber" value="' + esc(b.id) + '"' + (off ? " disabled" : "") + (st.barber && st.barber.id === b.id ? " checked" : "") + "><strong>" + esc(b.name) + "</strong><span>" + esc(b.title) + "</span>" + (off ? "<small>Not taking bookings</small>" : "") + "</label>";
+    }).join("") + "</div></fieldset>";
+  }
+
+  function dateOk(iso) {
+    const now = shopNow(st.cfg.timezone);
+    if (iso < now.date || iso > addDays(now.date, st.cfg.advance_days)) return false;
+    if (st.cfg.days_off.includes(iso)) return false;
+    const d = st.barber.schedule[weekdayKey(iso)];
+    if (!(d && d.on)) return false;
+    // hide days where the minimum-notice rule already rules out every slot
+    const earliest = absMinutes(now.date, now.minutes) + st.cfg.min_notice_hours * 60;
+    return absMinutes(iso, toMin(d.end)) - st.service.duration >= earliest;
+  }
+  function viewDate() {
+    const now = shopNow(st.cfg.timezone);
+    const start = addDays(now.date, st.weekOffset * 7);
+    const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
+    const maxOffset = Math.floor(st.cfg.advance_days / 7);
+    let h = '<fieldset class="panel nofield"><legend class="h2">Select date &amp; time</legend><h3>Choose a date</h3>' +
+      '<div class="week-nav"><button type="button" class="btn btn-outline" data-week="-1"' + (st.weekOffset <= 0 ? " disabled" : "") + '>&larr; Earlier</button><span class="muted">' + esc(fmtDate(days[0], { month: "short", day: "numeric" })) + " &ndash; " + esc(fmtDate(days[6], { month: "short", day: "numeric" })) + '</span><button type="button" class="btn btn-outline" data-week="1"' + (st.weekOffset >= maxOffset ? " disabled" : "") + '>Later &rarr;</button></div>' +
+      '<div class="option-grid date-grid">' + days.map((iso) => {
+        const ok = dateOk(iso), p = iso.split("-");
+        return '<label class="option"><input type="radio" name="date" value="' + iso + '"' + (ok ? "" : " disabled") + (st.date === iso ? " checked" : "") + '><small style="margin:0">' + esc(A.DAY_NAMES[weekdayKey(iso)]) + "</small><strong>" + Number(p[2]) + "</strong></label>";
+      }).join("") + "</div><h3>Choose a time</h3>";
+    if (!st.date) h += '<p class="muted">Pick a date to see the free times.</p>';
+    else if (st.loadingTimes) h += '<p class="muted">Loading times...</p>';
+    else if (!st.times.length) h += '<p class="muted">No free times on this day. Try another date.</p>';
+    else h += '<div class="option-grid time-grid">' + st.times.map((t) => '<label class="option"><input type="radio" name="time" value="' + t + '"' + (st.time === t ? " checked" : "") + ">" + esc(fmtTime(t)) + "</label>").join("") + "</div>";
+    return h + "</fieldset>";
+  }
+  function viewDetails() {
+    const d = st.details;
+    return '<div class="panel"><h2>Your details</h2>' +
+      '<div class="field"><label for="d-name">Full Name *</label><input id="d-name" data-f="name" autocomplete="name" value="' + esc(d.name) + '"></div>' +
+      '<div class="field"><label for="d-phone">Phone Number *</label><input id="d-phone" data-f="phone" type="tel" inputmode="numeric" maxlength="10" autocomplete="tel" placeholder="0555123456" aria-describedby="d-phone-hint" value="' + esc(d.phone) + '"><small class="hint" id="d-phone-hint">10 digits, for example 0555123456</small></div>' +
+      '<div class="field"><label for="d-notes">Special Notes (Optional)</label><textarea id="d-notes" data-f="notes" placeholder="Any specific requests or preferences...">' + esc(d.notes) + "</textarea></div></div>";
+  }
+  function viewConfirm() {
+    return '<div class="panel"><h2>Confirm your booking</h2><dl class="summary">' +
+      "<div><dt>Service:</dt><dd>" + esc(st.service.name) + " (" + money(st.service.price) + ", " + st.service.duration + " min)</dd></div>" +
+      "<div><dt>Barber:</dt><dd>" + esc(st.barber.name) + "</dd></div>" +
+      "<div><dt>Date:</dt><dd>" + esc(fmtDate(st.date)) + "</dd></div>" +
+      "<div><dt>Time:</dt><dd>" + esc(fmtTime(st.time)) + "</dd></div>" +
+      "<div><dt>Name:</dt><dd>" + esc(st.details.name) + "</dd></div>" +
+      "<div><dt>Phone:</dt><dd>" + esc(st.details.phone) + "</dd></div></dl>" +
+      '<p class="muted" style="margin-top:14px">You pay at the shop. Your booking starts as pending until we confirm it.</p></div>';
+  }
+  function viewDone() {
+    return '<div class="panel done-panel"><h2>You are booked!</h2><p>' + esc(st.service.name) + " with " + esc(st.barber.name) + " on " + esc(fmtDate(st.date)) + " at " + esc(fmtTime(st.time)) + '.</p><p class="muted">Keep your phone close. We may call to confirm.</p></div>';
+  }
+
+  function render() {
+    renderSteps();
+    panel.innerHTML = st.done ? viewDone() : [viewService, viewBarber, viewDate, viewDetails, viewConfirm][st.step - 1]();
+    renderNav();
+  }
+
+  /* ----- Free times ----- */
+  async function loadTimes() {
+    st.times = []; st.time = null; st.loadingTimes = true; render();
+    const { data, error } = await db.rpc("get_busy", { p_barber: st.barber.id, p_date: st.date });
+    st.loadingTimes = false;
+    if (error) { toast(friendly(error), "error"); return render(); }
+    const busy = data.map((r) => ({ s: toMin(r.start_time), e: toMin(r.start_time) + r.duration_min }));
+    const sched = st.barber.schedule[weekdayKey(st.date)];
+    const dur = st.service.duration, step = Math.max(5, st.cfg.slot_minutes + st.cfg.break_minutes);
+    const now = shopNow(st.cfg.timezone), earliest = absMinutes(now.date, now.minutes) + st.cfg.min_notice_hours * 60;
+    const out = [];
+    for (let m = toMin(sched.start); m + dur <= toMin(sched.end); m += step) {
+      if (absMinutes(st.date, m) < earliest) continue;
+      if (busy.some((b) => m < b.e && b.s < m + dur)) continue;
+      out.push(fromMin(m));
+    }
+    st.times = out; render();
+  }
+
+  /* ----- Events ----- */
+  panel.addEventListener("change", (e) => {
+    const t = e.target;
+    if (t.name === "service") { st.service = st.services.find((s) => s.id === t.value); st.date = st.time = null; st.times = []; renderNav(); }
+    else if (t.name === "barber") { st.barber = st.barbers.find((b) => b.id === t.value); st.date = st.time = null; st.times = []; renderNav(); }
+    else if (t.name === "date") { st.date = t.value; loadTimes(); }
+    else if (t.name === "time") { st.time = t.value; renderNav(); }
+  });
+  panel.addEventListener("input", (e) => {
+    const f = e.target.dataset.f; if (!f) return;
+    if (f === "phone") e.target.value = e.target.value.replace(/\D/g, "").slice(0, 10);   // digits only, max 10
+    st.details[f] = e.target.value; renderNav();
+  });
+  panel.addEventListener("click", (e) => {
+    const w = e.target.closest("[data-week]"); if (!w) return;
+    st.weekOffset = Math.max(0, st.weekOffset + Number(w.dataset.week)); render();
+  });
+  nav.addEventListener("click", async (e) => {
+    const b = e.target.closest("[data-go]"); if (!b || b.disabled) return;
+    if (b.dataset.go === "again") { Object.assign(st, { step: 1, service: null, barber: null, date: null, time: null, times: [], weekOffset: 0, done: null, details: { name: "", phone: "", notes: "" } }); render(); toTop(); return; }
+    if (b.dataset.go === "back") { st.step = Math.max(1, st.step - 1); render(); toTop(); return; }
+    if (st.step < 5) { st.step++; render(); toTop(); return; }
+    b.disabled = true; b.textContent = "Booking...";
+    const d = st.details;
+    const { error } = await db.rpc("book_appointment", { p_service: st.service.id, p_barber: st.barber.id, p_date: st.date, p_time: st.time, p_name: d.name, p_phone: d.phone, p_email: "", p_notes: d.notes });
+    if (error) {
+      toast(friendly(error), "error");
+      if (/slot_taken|too_soon|day_off|barber_off|outside_hours|date_out_of_range/.test(error.message || "")) { st.step = 3; await loadTimes(); st.time = null; }
+      return render();
+    }
+    st.done = true; render(); toTop();
+  });
+
+  /* ----- A "Book with Me" button in the team section ----- */
+  let pending = null;
+  function pickBarber(id) {
+    const bb = st.barbers.find((x) => x.id === id && worksAny(x)); if (!bb) return;
+    if (st.done) Object.assign(st, { done: null, service: null, details: { name: "", phone: "", notes: "" } });
+    st.barber = bb; st.date = st.time = null; st.times = []; st.weekOffset = 0;
+    st.step = st.service ? 3 : 1; render();
+  }
+  window.addEventListener("select-barber", (e) => { if (st.cfg) pickBarber(e.detail); else pending = e.detail; });
+
+  /* ----- Start ----- */
+  (async function init() {
+    panel.innerHTML = '<div class="panel"><p class="muted">Loading...</p></div>'; renderSteps();
+    try {
+      const [s, b, cfg] = await Promise.all([db.from("services").select("*").order("price"), db.from("barbers").select("*").order("created_at"), A.getSettings()]);
+      if (s.error) throw s.error; if (b.error) throw b.error;
+      st.services = s.data; st.barbers = b.data; st.cfg = cfg;
+      if (pending) { pickBarber(pending); pending = null; }
+      render();
+    } catch (err) { panel.innerHTML = '<div class="panel"><p>' + esc(friendly(err)) + "</p></div>"; }
+  })();
+})();
+
+  </script>
+</body>
+</html>
